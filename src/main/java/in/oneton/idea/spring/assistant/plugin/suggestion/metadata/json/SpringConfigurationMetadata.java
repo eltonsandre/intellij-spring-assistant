@@ -11,9 +11,9 @@ import java.util.List;
  */
 @Data
 public class SpringConfigurationMetadata {
-  @Nullable
-  private List<SpringConfigurationMetadataGroup> groups;
-  private List<SpringConfigurationMetadataProperty> properties;
-  @Nullable
-  private List<SpringConfigurationMetadataHint> hints;
+    @Nullable
+    private List<SpringConfigurationMetadataGroup> groups;
+    private List<SpringConfigurationMetadataProperty> properties;
+    @Nullable
+    private List<SpringConfigurationMetadataHint> hints;
 }

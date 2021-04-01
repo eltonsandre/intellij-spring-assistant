@@ -10,19 +10,19 @@ import java.util.List;
 
 public interface SuggestionDocumentationHelper extends SuggestionNodeTypeProvider {
 
-  @Nullable
-  String getOriginalName();
+    @Nullable
+    String getOriginalName();
 
-  @NotNull
-  Suggestion buildSuggestionForKey(Module module, FileType fileType,
-      List<SuggestionNode> matchesRootTillMe, int numOfAncestors);
+    @NotNull
+    Suggestion buildSuggestionForKey(Module module, FileType fileType,
+                                     List<SuggestionNode> matchesRootTillMe, int numOfAncestors);
 
-  /**
-   * @return false if an intermediate node (neither group, nor property, nor class). true otherwise
-   */
-  boolean supportsDocumentation();
+    /**
+     * @return false if an intermediate node (neither group, nor property, nor class). true otherwise
+     */
+    boolean supportsDocumentation();
 
-  @NotNull
-  String getDocumentationForKey(Module module, String nodeNavigationPathDotDelimited);
+    @NotNull
+    String getDocumentationForKey(Module module, String nodeNavigationPathDotDelimited);
 
 }

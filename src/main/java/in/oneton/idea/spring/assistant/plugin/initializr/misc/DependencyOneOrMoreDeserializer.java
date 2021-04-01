@@ -14,35 +14,35 @@ import java.util.List;
 
 public class DependencyOneOrMoreDeserializer implements JsonDeserializer<List<DependencyLink>> {
 
-  @Override
-  public List<DependencyLink> deserialize(JsonElement jsonElement, Type type,
-      JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-    List<DependencyLink> dependencyLinks = null;
-    if (jsonElement instanceof JsonArray) {
-      dependencyLinks = new ArrayList<>();
-      JsonArray elements = JsonArray.class.cast(jsonElement);
-      for (JsonElement element : elements) {
-        dependencyLinks.add(newDependencyLink((JsonObject) element));
-      }
-    } else if (jsonElement instanceof JsonObject) {
-      dependencyLinks = new ArrayList<>();
-      DependencyLink dependencyLink = newDependencyLink((JsonObject) jsonElement);
-      dependencyLinks.add(dependencyLink);
+    @Override
+    public List<DependencyLink> deserialize(JsonElement jsonElement, Type type,
+                                            JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+        List<DependencyLink> dependencyLinks = null;
+        if (jsonElement instanceof JsonArray) {
+            dependencyLinks = new ArrayList<>();
+            JsonArray elements = (JsonArray) jsonElement;
+            for (JsonElement element : elements) {
+                dependencyLinks.add(newDependencyLink((JsonObject) element));
+            }
+        } else if (jsonElement instanceof JsonObject) {
+            dependencyLinks = new ArrayList<>();
+            DependencyLink dependencyLink = newDependencyLink((JsonObject) jsonElement);
+            dependencyLinks.add(dependencyLink);
+        }
+        return dependencyLinks;
     }
-    return dependencyLinks;
-  }
 
-  private DependencyLink newDependencyLink(JsonObject jsonObject) {
-    DependencyLink.DependencyLinkBuilder builder = DependencyLink.builder();
-    JsonElement href = jsonObject.get("href");
-    if (href != null) {
-      builder.href(href.getAsString());
+    private DependencyLink newDependencyLink(JsonObject jsonObject) {
+        DependencyLink.DependencyLinkBuilder builder = DependencyLink.builder();
+        JsonElement href = jsonObject.get("href");
+        if (href != null) {
+            builder.href(href.getAsString());
+        }
+        JsonElement title = jsonObject.get("title");
+        if (title != null) {
+            builder.title(title.getAsString());
+        }
+        return builder.build();
     }
-    JsonElement title = jsonObject.get("title");
-    if (title != null) {
-      builder.title(title.getAsString());
-    }
-    return builder.build();
-  }
 
 }

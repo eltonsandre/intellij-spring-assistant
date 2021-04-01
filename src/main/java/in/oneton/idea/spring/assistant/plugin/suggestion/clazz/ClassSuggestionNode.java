@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public interface ClassSuggestionNode extends SuggestionNode {
-  @NotNull
-  Suggestion buildSuggestionForKey(Module module, FileType fileType,
-      List<SuggestionNode> matchesRootTillMe, int numOfAncestors);
+    @NotNull
+    Suggestion buildSuggestionForKey(Module module, FileType fileType,
+                                     List<SuggestionNode> matchesRootTillMe, int numOfAncestors);
 }

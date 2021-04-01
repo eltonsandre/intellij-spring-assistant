@@ -32,7 +32,7 @@ import static in.oneton.idea.spring.assistant.plugin.suggestion.SuggestionNodeTy
 public class YamlKeyInsertHandler implements InsertHandler<LookupElement> {
 
     @Override
-    public void handleInsert(final InsertionContext context, final LookupElement lookupElement) {
+    public void handleInsert(final @NotNull InsertionContext context, final @NotNull LookupElement lookupElement) {
         if (!nextCharAfterSpacesAndQuotesIsColon(getStringAfterAutoCompletedValue(context))) {
             String existingIndentation = getExistingIndentation(context, lookupElement);
             Suggestion suggestion = (Suggestion) lookupElement.getObject();
@@ -93,7 +93,7 @@ public class YamlKeyInsertHandler implements InsertHandler<LookupElement> {
             }
             count++;
         }
-        return val.substring(val.length() - count, val.length()).replaceAll("-", " ");
+        return val.substring(val.length() - count).replaceAll("-", " ");
     }
 
     private void deleteLookupTextAndRetrieveOldValue(InsertionContext context,
@@ -126,7 +126,7 @@ public class YamlKeyInsertHandler implements InsertHandler<LookupElement> {
 
     @NotNull
     private String getSuggestionReplacementWithCaret(final Module module, final Suggestion suggestion,
-                                                     final  String existingIndentation, final String indentPerLevel) {
+                                                     final String existingIndentation, final String indentPerLevel) {
 
         final List<? extends OriginalNameProvider> matchesTopFirst = suggestion.getMatchesForReplacement();
 //        int i = 0; do { OriginalNameProvider nameProvider = matchesTopFirst.get(i); //code i++; } while (i < matchesTopFirst.size());
@@ -134,11 +134,11 @@ public class YamlKeyInsertHandler implements InsertHandler<LookupElement> {
         final StringBuilder builder = new StringBuilder();
         final AtomicInteger count = new AtomicInteger(0);
         matchesTopFirst.forEach(nameProvider ->
-            builder.append(StringUtils.LF)
-                    .append(existingIndentation)
-                    .append(getIndent(indentPerLevel, count.getAndIncrement()))
-                    .append(nameProvider.getOriginalName())
-                    .append(":")
+                builder.append(StringUtils.LF)
+                        .append(existingIndentation)
+                        .append(getIndent(indentPerLevel, count.getAndIncrement()))
+                        .append(nameProvider.getOriginalName())
+                        .append(":")
         );
 
         builder.delete(0, existingIndentation.length() + 1);

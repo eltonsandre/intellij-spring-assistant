@@ -22,7 +22,6 @@ import com.intellij.psi.PsiPrimitiveType;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.PsiTypeParameter;
 import com.intellij.psi.PsiWildcardType;
-import com.intellij.psi.impl.source.PsiClassReferenceType;
 import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.psi.util.CachedValue;
 import com.intellij.psi.util.PropertyUtil;
@@ -34,7 +33,6 @@ import gnu.trove.TObjectHashingStrategy;
 import in.oneton.idea.spring.assistant.plugin.suggestion.SuggestionNodeType;
 import in.oneton.idea.spring.assistant.plugin.suggestion.clazz.GenericClassMemberWrapper;
 import lombok.experimental.UtilityClass;
-import org.gradle.internal.impldep.org.junit.platform.commons.function.Try;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -108,9 +106,9 @@ public class PsiCustomUtil {
             boolean typeValid = isValidType(type);
             if (typeValid) {
                 if (type instanceof PsiClassType) {
-                    return PsiClassType.class.cast(type);
+                    return (PsiClassType) type;
                 } else if (type instanceof PsiArrayType) {
-                    return PsiArrayType.class.cast(type);
+                    return (PsiArrayType) type;
                 }
             }
             return null;
@@ -147,7 +145,7 @@ public class PsiCustomUtil {
             return null;
         } else if (type instanceof PsiClassType) {
             PsiClassType.ClassResolveResult resolveResult =
-                    PsiClassType.class.cast(type).resolveGenerics();
+                    ((PsiClassType) type).resolveGenerics();
             if (resolveResult.isValidResult()) {
                 return resolveResult.getSubstitutor().getSubstitutionMap();
             }
@@ -247,7 +245,7 @@ public class PsiCustomUtil {
     @Nullable
     public static String toClassFqn(@NotNull PsiType type) {
         if (type instanceof PsiArrayType) {
-            String componentLongName = toClassFqn(PsiArrayType.class.cast(type).getComponentType());
+            String componentLongName = toClassFqn(((PsiArrayType) type).getComponentType());
             if (componentLongName != null) {
                 return componentLongName + "[]";
             }
@@ -263,7 +261,7 @@ public class PsiCustomUtil {
     public static String toClassNonQualifiedName(@NotNull PsiType type) {
         if (type instanceof PsiArrayType) {
             String componentLongName =
-                    toClassNonQualifiedName(PsiArrayType.class.cast(type).getComponentType());
+                    toClassNonQualifiedName(((PsiArrayType) type).getComponentType());
             if (componentLongName != null) {
                 return componentLongName + "[]";
             }
@@ -292,7 +290,7 @@ public class PsiCustomUtil {
     @NotNull
     public static PsiType getBoxedTypeFromPrimitiveType(Module module,
                                                         PsiPrimitiveType primitiveType) {
-        PsiType boxedPrimitiveType = safeGetValidType(module, primitiveType.getBoxedTypeName());
+        PsiType boxedPrimitiveType = safeGetValidType(module, requireNonNull(primitiveType.getBoxedTypeName()));
         assert boxedPrimitiveType instanceof PsiClassType;
         return boxedPrimitiveType;
     }
@@ -301,7 +299,7 @@ public class PsiCustomUtil {
     public static String typeToFqn(Module module, @NotNull PsiType type) {
         if (isValidType(type)) {
             if (type instanceof PsiArrayType) {
-                type = PsiArrayType.class.cast(type).getComponentType();
+                type = ((PsiArrayType) type).getComponentType();
                 return type.getCanonicalText();
             } else if (type instanceof PsiPrimitiveType) {
                 return getBoxedTypeFromPrimitiveType(module, (PsiPrimitiveType) type).getCanonicalText();
@@ -317,7 +315,7 @@ public class PsiCustomUtil {
         PsiType originalType = type;
         if (isValidType(type)) {
             if (type instanceof PsiArrayType) {
-                return computeDependencies(module, PsiArrayType.class.cast(type).getComponentType());
+                return computeDependencies(module, ((PsiArrayType) type).getComponentType());
             } else if (type instanceof PsiPrimitiveType) {
                 type = getBoxedTypeFromPrimitiveType(module, (PsiPrimitiveType) type);
             } else if (type instanceof PsiWildcardType) {
@@ -332,7 +330,7 @@ public class PsiCustomUtil {
                 Collection<PsiType> typeParams =
                         classType.resolveGenerics().getSubstitutor().getSubstitutionMap().values();
                 TObjectHashingStrategy<PsiClass> nameComparingHashingStrategy =
-                        new TObjectHashingStrategy<PsiClass>() {
+                        new TObjectHashingStrategy<>() {
                             @Override
                             public int computeHashCode(PsiClass psiClass) {
                                 return requireNonNull(psiClass.getQualifiedName()).hashCode();
@@ -383,7 +381,7 @@ public class PsiCustomUtil {
         }
 
         if (type instanceof PsiArrayType) {
-            return isValidType(PsiArrayType.class.cast(type).getComponentType());
+            return isValidType(((PsiArrayType) type).getComponentType());
         } else if (type instanceof PsiWildcardType) {
             PsiType bound = ((PsiWildcardType) type).getBound();
 
@@ -474,7 +472,7 @@ public class PsiCustomUtil {
                     }
                 } else {
                     final PsiType returnType = method.getReturnType();
-                    if (returnType != null && representsCollection(psiClass, returnType)) {
+                    if (representsCollection(psiClass, returnType)) {
                         final PsiField field = psiClass.findFieldByName(propertyName, true);
                         if (field != null && !field.hasModifierProperty(STATIC)) {
                             final PsiType fieldType = getWritablePropertyType(psiClass, field);
@@ -601,9 +599,9 @@ public class PsiCustomUtil {
     public static String computeDocumentation(PsiMember member) {
         PsiDocComment docComment;
         if (member instanceof PsiField) {
-            docComment = PsiField.class.cast(member).getDocComment();
+            docComment = ((PsiField) member).getDocComment();
         } else if (member instanceof PsiMethod) {
-            docComment = PsiMethod.class.cast(member).getDocComment();
+            docComment = ((PsiMethod) member).getDocComment();
         } else {
             throw new RuntimeException("Method supports targets of type PsiField & PsiMethod only");
         }
@@ -631,11 +629,7 @@ public class PsiCustomUtil {
     @Nullable
     public static VirtualFile findFileUnderRootInModule(@NotNull VirtualFile contentRoot,
                                                         String targetFileName) {
-        VirtualFile childFile = contentRoot.findChild(targetFileName);
-        if (childFile != null) {
-            return childFile;
-        }
-        return null;
+        return contentRoot.findChild(targetFileName);
     }
 
     /**

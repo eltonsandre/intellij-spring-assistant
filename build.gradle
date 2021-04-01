@@ -16,7 +16,7 @@ plugins {
 
 
 group = 'in.oneton.idea.spring'
-version = '1.0.0'
+version = '1.1.0'
 
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
@@ -42,7 +42,7 @@ configurations {
 dependencies {
 
     ['annotationProcessor', 'compileOnly', 'testAnnotationProcessor', 'testCompileOnly']
-            .each { conf -> add(conf, 'org.projectlombok:lombok:1.18.16') }
+            .each { conf -> add(conf, 'org.projectlombok:lombok:1.18.18') }
 
     implementation 'org.apache.commons:commons-collections4:4.1'
     implementation 'com.miguelfonseca.completely:completely-core:0.8.0'
@@ -61,8 +61,7 @@ clean.doFirst {
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     type = 'IC'
-    version = '2020.3.2'
-//  version= '2020.2'
+    version = '2020.3.3'
     pluginName = 'intellij-spring-assistant'
     plugins = ['java', 'properties', 'yaml', 'maven', 'gradle']
 //  updateSinceUntilBuild false

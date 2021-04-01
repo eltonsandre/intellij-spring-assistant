@@ -9,11 +9,11 @@ import javax.annotation.Nullable;
  */
 @Data
 public class SpringConfigurationMetadataDeprecation {
-  // In some manifests, this value is null for some strange reason
-  @Nullable
-  private SpringConfigurationMetadataDeprecationLevel level;
-  @Nullable
-  private String reason;
-  @Nullable
-  private String replacement;
+    // In some manifests, this value is null for some strange reason
+    @Nullable
+    private SpringConfigurationMetadataDeprecationLevel level;
+    @Nullable
+    private String reason;
+    @Nullable
+    private String replacement;
 }

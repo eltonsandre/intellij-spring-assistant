@@ -7,21 +7,33 @@ Spring Assistant - IntelliJ plugin that assists you in developing spring applica
 
 This plugins provides the following features as of now.
 
-1. Auto completion of the configuration properties in your `yaml` files based on the spring boot's auto configuration jars are present in the classpath
-2. Auto completion of the configuration properties in your `yaml` files if you have classes annotated with `@ConfigurationProperties`, [if your build is properly configured](#setup-for-showing-configurationproperties-as-suggestions-within-current-module)
-3. Short form search & search for element deep within is also supported. i.e, `sp.d` will show you `spring.data`, `spring.datasource`, also, `port` would show `server.port` as a suggestion
-4. Quick documentation for groups & properties (not all groups & properties will have documentation, depends on whether the original author specified documentation or not for any given element)
-5. Allows you to bootstrap new project & new module using `File -> New -> Project -> Spring Assistant` & `File -> New -> Module -> Spring Assistant` wizards. Looks & Feel resembles Intellij Ultimate, but with less bells & whistles
+1. Auto completion of the configuration properties in your `yaml` files based on the spring boot's auto configuration jars are present in the
+   classpath
+2. Auto completion of the configuration properties in your `yaml` files if you have classes annotated with `@ConfigurationProperties`
+   , [if your build is properly configured](#setup-for-showing-configurationproperties-as-suggestions-within-current-module)
+3. Short form search & search for element deep within is also supported. i.e, `sp.d` will show you `spring.data`, `spring.datasource`, also, `port`
+   would show `server.port` as a suggestion
+4. Quick documentation for groups & properties (not all groups & properties will have documentation, depends on whether the original author specified
+   documentation or not for any given element)
+5. Allows you to bootstrap new project & new module using `File -> New -> Project -> Spring Assistant` & `File -> New -> Module -> Spring Assistant`
+   wizards. Looks & Feel resembles Intellij Ultimate, but with less bells & whistles
+
+## Download
+
+[intellij-spring-assistant-1.1.0.zip](dist/intellij-spring-assistant-1.1.0.zip)
 
 ## Usage
 
-Assuming that you have Spring boot's auto configuration jars are present in the classpath, this plugin will automatically allows you to autocomplete properties as suggestions in all your `yml` files
+Assuming that you have Spring boot's auto configuration jars are present in the classpath, this plugin will automatically allows you to autocomplete
+properties as suggestions in all your `yml` files
 
 Suggestions would appear as soon as you type/press `CTRL+SPACE`.
 
-Short form suggestions are also supported such as, `sp.d` will show you `spring.data`, `spring.datasource`, e.t.c as suggestions that make your typing faster
+Short form suggestions are also supported such as, `sp.d` will show you `spring.data`, `spring.datasource`, e.t.c as suggestions that make your typing
+faster
 
-In addition to libraries in the classpath, the plugin also allows you to have your own `@ConfigurationProperties` available as suggestions in all your `yml` files.
+In addition to libraries in the classpath, the plugin also allows you to have your own `@ConfigurationProperties` available as suggestions in all
+your `yml` files.
 
 For this to work, you need to ensure the following steps are followed for your project/module
 

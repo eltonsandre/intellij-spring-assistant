@@ -11,51 +11,51 @@ import java.awt.*;
 
 public class DependencySelectionStep extends ModuleWizardStep implements Disposable {
 
-  private final ProjectCreationRequest request;
-  private JPanel rootPanel;
-  private DependencySelection dependencySelection;
+    private final ProjectCreationRequest request;
+    private final JPanel rootPanel;
+    private DependencySelection dependencySelection;
 
-  public DependencySelectionStep(InitializrModuleBuilder moduleBuilder) {
-    request = moduleBuilder.safeGetProjectCreationRequest();
-    rootPanel = new JPanel();
-    rootPanel.setLayout(new BorderLayout());
-  }
-
-  @Override
-  public void _init() {
-    rootPanel.removeAll();
-    dependencySelection = new DependencySelection();
-    dependencySelection.init(request);
-    rootPanel.add(dependencySelection.getRootPanel());
-  }
-
-  @Override
-  public boolean validate() throws ConfigurationException {
-    if (request.getDependencyCount() == 0) {
-      throw new ConfigurationException("Please select atleast one dependency",
-          "Selection required");
+    public DependencySelectionStep(InitializrModuleBuilder moduleBuilder) {
+        request = moduleBuilder.safeGetProjectCreationRequest();
+        rootPanel = new JPanel();
+        rootPanel.setLayout(new BorderLayout());
     }
-    return super.validate();
-  }
 
-  @Override
-  public JComponent getPreferredFocusedComponent() {
-    return dependencySelection.getPreferredFocusedComponent();
-  }
+    @Override
+    public void _init() {
+        rootPanel.removeAll();
+        dependencySelection = new DependencySelection();
+        dependencySelection.init(request);
+        rootPanel.add(dependencySelection.getRootPanel());
+    }
 
-  @Override
-  public JComponent getComponent() {
-    return rootPanel;
-  }
+    @Override
+    public boolean validate() throws ConfigurationException {
+        if (request.getDependencyCount() == 0) {
+            throw new ConfigurationException("Please select atleast one dependency",
+                    "Selection Required");
+        }
+        return super.validate();
+    }
 
-  @Override
-  public void updateDataModel() {
+    @Override
+    public JComponent getPreferredFocusedComponent() {
+        return dependencySelection.getPreferredFocusedComponent();
+    }
 
-  }
+    @Override
+    public JComponent getComponent() {
+        return rootPanel;
+    }
 
-  @Override
-  public void dispose() {
-    dependencySelection.dispose();
-  }
+    @Override
+    public void updateDataModel() {
+
+    }
+
+    @Override
+    public void dispose() {
+        dependencySelection.dispose();
+    }
 
 }

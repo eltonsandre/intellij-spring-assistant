@@ -32,17 +32,19 @@ import static in.oneton.idea.spring.assistant.plugin.suggestion.SuggestionNode.s
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(of = "originalName")
-@EqualsAndHashCode(of = "name", callSuper = false)
+@ToString(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public class MetadataPropertySuggestionNode extends MetadataSuggestionNode {
 
     /**
      * Sanitised name used for lookup. `-`, `_` are removed, upper cased characters are converted to lower case
      */
+    @EqualsAndHashCode.Include
     private String name;
     /**
      * Section of the group/PROPERTY name. Sole purpose of this is to split all properties into their individual part
      */
+    @ToString.Include
     private String originalName;
     /**
      * Parent reference, for bidirectional navigation. Can be null for roots
@@ -204,7 +206,7 @@ public class MetadataPropertySuggestionNode extends MetadataSuggestionNode {
     }
 
     @Override
-    protected boolean hasOnlyOneChild(Module module) {
+    protected boolean hasOnlyOneChild() {
         // since we have to delegate any further lookups to the delegate (which has additional cost associated with parsing & building childrenTrie dynamically)
         // lets always lie to caller that we have more than one child so that the search terminates at this node on the initial lookup
         return false;
