@@ -4,5 +4,5 @@ import in.oneton.idea.spring.assistant.plugin.initializr.metadata.InitializerMet
 import org.jetbrains.annotations.NotNull;
 
 public interface DependencyAdditionListener {
-  void onDependencyAdded(@NotNull Dependency dependency);
+    void onDependencyAdded(@NotNull Dependency dependency);
 }

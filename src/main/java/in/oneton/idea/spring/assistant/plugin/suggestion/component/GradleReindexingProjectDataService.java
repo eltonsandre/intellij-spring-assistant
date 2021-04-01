@@ -28,61 +28,61 @@ import static java.util.Arrays.stream;
  */
 @Order(5000)
 public class GradleReindexingProjectDataService
-    extends AbstractProjectDataService<ModuleData, Void> {
+        extends AbstractProjectDataService<ModuleData, Void> {
 
-  private static final Logger log = Logger.getInstance(GradleReindexingProjectDataService.class);
+    private static final Logger log = Logger.getInstance(GradleReindexingProjectDataService.class);
 
-  @NotNull
-  @Override
-  public Key<ModuleData> getTargetDataKey() {
-    return ProjectKeys.MODULE;
-  }
+    @NotNull
+    @Override
+    public Key<ModuleData> getTargetDataKey() {
+        return ProjectKeys.MODULE;
+    }
 
-  @Override
-  public void onSuccessImport(@NotNull Collection<DataNode<ModuleData>> imported,
-      @Nullable ProjectData projectData, @NotNull Project project,
-      @NotNull IdeModelsProvider modelsProvider) {
-    if (projectData != null) {
-      debug(() -> log.debug(
-          "Gradle dependencies are updated for project, will trigger indexing via dumbservice for project "
-              + project.getName()));
-      DumbService.getInstance(project).smartInvokeLater(() -> {
-        log.debug("Will attempt to trigger indexing for project " + project.getName());
-        SuggestionService service = ServiceManager.getService(project, SuggestionService.class);
-
-        try {
-          Module[] validModules = stream(modelsProvider.getModules()).filter(module -> {
-            String externalRootProjectPath = getExternalRootProjectPath(module);
-            return externalRootProjectPath != null && externalRootProjectPath
-                .equals(projectData.getLinkedExternalProjectPath());
-          }).toArray(Module[]::new);
-
-          if (validModules.length > 0) {
-            service.reindex(project, validModules);
-          } else {
+    @Override
+    public void onSuccessImport(@NotNull Collection<DataNode<ModuleData>> imported,
+                                @Nullable ProjectData projectData, @NotNull Project project,
+                                @NotNull IdeModelsProvider modelsProvider) {
+        if (projectData != null) {
             debug(() -> log.debug(
-                "None of the modules " + moduleNamesAsStrCommaDelimited(modelsProvider.getModules(),
-                    true) + " are relevant for indexing, skipping for project " + project
-                    .getName()));
-          }
-        } catch (Throwable e) {
-          log.error("Error occurred while indexing project " + project.getName() + " & modules "
-              + moduleNamesAsStrCommaDelimited(modelsProvider.getModules(), false), e);
-        }
-      });
-    }
-  }
+                    "Gradle dependencies are updated for project, will trigger indexing via dumbservice for project "
+                            + project.getName()));
+            DumbService.getInstance(project).smartInvokeLater(() -> {
+                log.debug("Will attempt to trigger indexing for project " + project.getName());
+                SuggestionService service = ServiceManager.getService(project, SuggestionService.class);
 
-  /**
-   * Debug logging can be enabled by adding fully classified class name/package name with # prefix
-   * For eg., to enable debug logging, go `Help > Debug log settings` & type `#in.oneton.idea.spring.assistant.plugin.suggestion.service.SuggestionServiceImpl`
-   *
-   * @param doWhenDebug code to execute when debug is enabled
-   */
-  private void debug(Runnable doWhenDebug) {
-    if (log.isDebugEnabled()) {
-      doWhenDebug.run();
+                try {
+                    Module[] validModules = stream(modelsProvider.getModules()).filter(module -> {
+                        String externalRootProjectPath = getExternalRootProjectPath(module);
+                        return externalRootProjectPath != null && externalRootProjectPath
+                                .equals(projectData.getLinkedExternalProjectPath());
+                    }).toArray(Module[]::new);
+
+                    if (validModules.length > 0) {
+                        service.reindex(project, validModules);
+                    } else {
+                        debug(() -> log.debug(
+                                "None of the modules " + moduleNamesAsStrCommaDelimited(modelsProvider.getModules(),
+                                        true) + " are relevant for indexing, skipping for project " + project
+                                        .getName()));
+                    }
+                } catch (Throwable e) {
+                    log.error("Error occurred while indexing project " + project.getName() + " & modules "
+                            + moduleNamesAsStrCommaDelimited(modelsProvider.getModules(), false), e);
+                }
+            });
+        }
     }
-  }
+
+    /**
+     * Debug logging can be enabled by adding fully classified class name/package name with # prefix
+     * For eg., to enable debug logging, go `Help > Debug log settings` & type `#in.oneton.idea.spring.assistant.plugin.suggestion.service.SuggestionServiceImpl`
+     *
+     * @param doWhenDebug code to execute when debug is enabled
+     */
+    private void debug(Runnable doWhenDebug) {
+        if (log.isDebugEnabled()) {
+            doWhenDebug.run();
+        }
+    }
 
 }

@@ -1,6 +1,5 @@
 package in.oneton.idea.spring.assistant.plugin.suggestion.service;
 
-import com.google.gson.GsonBuilder;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
@@ -11,6 +10,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import gnu.trove.THashMap;
 import gnu.trove.THashSet;
+import in.oneton.idea.spring.assistant.plugin.initializr.misc.JsonUtil;
 import in.oneton.idea.spring.assistant.plugin.suggestion.Suggestion;
 import in.oneton.idea.spring.assistant.plugin.suggestion.SuggestionNode;
 import in.oneton.idea.spring.assistant.plugin.suggestion.completion.FileType;
@@ -18,23 +18,17 @@ import in.oneton.idea.spring.assistant.plugin.suggestion.metadata.MetadataContai
 import in.oneton.idea.spring.assistant.plugin.suggestion.metadata.MetadataNonPropertySuggestionNode;
 import in.oneton.idea.spring.assistant.plugin.suggestion.metadata.MetadataPropertySuggestionNode;
 import in.oneton.idea.spring.assistant.plugin.suggestion.metadata.MetadataSuggestionNode;
-import in.oneton.idea.spring.assistant.plugin.suggestion.metadata.json.GsonPostProcessEnablingTypeFactory;
 import in.oneton.idea.spring.assistant.plugin.suggestion.metadata.json.SpringConfigurationMetadata;
 import in.oneton.idea.spring.assistant.plugin.suggestion.metadata.json.SpringConfigurationMetadataGroup;
 import in.oneton.idea.spring.assistant.plugin.suggestion.metadata.json.SpringConfigurationMetadataHint;
 import in.oneton.idea.spring.assistant.plugin.suggestion.metadata.json.SpringConfigurationMetadataProperty;
-import in.oneton.idea.spring.assistant.plugin.suggestion.metadata.json.SpringConfigurationMetadataValueProviderType;
-import in.oneton.idea.spring.assistant.plugin.suggestion.metadata.json.SpringConfigurationMetadataValueProviderTypeDeserializer;
 import org.apache.commons.collections4.Trie;
 import org.apache.commons.collections4.trie.PatriciaTrie;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -54,7 +48,6 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
@@ -106,7 +99,6 @@ public class SuggestionServiceImpl implements SuggestionService {
         if (indexingInProgress) {
             currentExecution.cancel(false);
         }
-        //noinspection CodeBlock2Expr
         currentExecution = getApplication().executeOnPooledThread(() -> getApplication()
                         .runReadAction(() -> {
                             indexingInProgress = true;
@@ -137,7 +129,6 @@ public class SuggestionServiceImpl implements SuggestionService {
         if (this.indexingInProgress && currentExecution != null) {
             this.currentExecution.cancel(false);
         }
-        //noinspection CodeBlock2Expr
         this.currentExecution = getApplication().executeOnPooledThread(() ->
                 getApplication().runReadAction(() -> {
                     debug(() -> log.debug("-> Indexing requested for a subset of modules of project " + project.getName()));
@@ -176,7 +167,7 @@ public class SuggestionServiceImpl implements SuggestionService {
 
     @Nullable
     @Override
-    public List<SuggestionNode> findMatchedNodesRootTillEnd(Project project, Module module,
+    public List<SuggestionNode> findMatchedNodesRootTillEnd(Module module,
                                                             List<String> containerElements) {
         if (moduleNameToRootSearchIndex.containsKey(module.getName())) {
             String[] pathSegments =
@@ -196,14 +187,14 @@ public class SuggestionServiceImpl implements SuggestionService {
     }
 
     @Override
-    public boolean canProvideSuggestions(Project project, Module module) {
+    public boolean canProvideSuggestions(Module module) {
         Trie<String, MetadataSuggestionNode> rootSearchIndex =
                 moduleNameToRootSearchIndex.get(module.getName());
         return rootSearchIndex != null && rootSearchIndex.size() != 0;
     }
 
     @Override
-    public List<LookupElementBuilder> findSuggestionsForQueryPrefix(Project project, Module module,
+    public List<LookupElementBuilder> findSuggestionsForQueryPrefix(Module module,
                                                                     FileType fileType, PsiElement element, @Nullable List<String> ancestralKeys,
                                                                     String queryWithDotDelimitedPrefixes, @Nullable Set<String> siblingsToExclude) {
         return doFindSuggestionsForQueryPrefix(module,
@@ -400,13 +391,7 @@ public class SuggestionServiceImpl implements SuggestionService {
             final String metadataFilePath = metadataContainerInfo.getFileUrl();
 
             try (final var inputStream = metadataContainerInfo.getMetadataFile().getInputStream()) {
-                final var springConfigurationMetadata = new GsonBuilder()
-                        // register custom mapper adapters
-                        .registerTypeAdapter(SpringConfigurationMetadataValueProviderType.class,
-                                new SpringConfigurationMetadataValueProviderTypeDeserializer())
-                        .registerTypeAdapterFactory(new GsonPostProcessEnablingTypeFactory())
-                        .create()
-                        .fromJson(new BufferedReader(new InputStreamReader(inputStream)), SpringConfigurationMetadata.class);
+                final SpringConfigurationMetadata springConfigurationMetadata = JsonUtil.fromJson(inputStream, SpringConfigurationMetadata.class);
 
                 buildMetadataHierarchy(module, rootSearchIndex, metadataContainerInfo, springConfigurationMetadata);
 
@@ -472,13 +457,13 @@ public class SuggestionServiceImpl implements SuggestionService {
                     if (!closestMetadata.isProperty()) {
                         log.warn(
                                 "Unexpected hint " + hint.getName() + " is assigned to  group " + closestMetadata
-                                        .getPathFromRoot(module)
+                                        .getPathFromRoot()
                                         + " found. Hints can be only assigned to property. Ignoring the hint completely.Existing group belongs to ("
-                                        + closestMetadata.getBelongsTo().stream().collect(joining(","))
+                                        + String.join(",", closestMetadata.getBelongsTo())
                                         + "), New hint belongs " + containerPath);
                     } else {
                         MetadataPropertySuggestionNode propertySuggestionNode =
-                                MetadataPropertySuggestionNode.class.cast(closestMetadata);
+                                (MetadataPropertySuggestionNode) closestMetadata;
                         if (hint.representsValueOfMap()) {
                             propertySuggestionNode.getProperty().setValueHint(hint);
                         } else {
@@ -524,28 +509,28 @@ public class SuggestionServiceImpl implements SuggestionService {
 
             if (haveMoreSegmentsLeft) {
                 if (!closestMetadata.isProperty()) {
-                    MetadataNonPropertySuggestionNode.class.cast(closestMetadata)
+                    ((MetadataNonPropertySuggestionNode) closestMetadata)
                             .addChildren(property, rawPathSegments, startIndex, containerArchiveOrFileRef);
                 } else {
                     log.warn("Detected conflict between a new group & existing property for suggestion path "
-                            + closestMetadata.getPathFromRoot(module)
-                            + ". Ignoring property. Existing non property node belongs to (" + closestMetadata
-                            .getBelongsTo().stream().collect(joining(",")) + "), New property belongs to "
+                            + closestMetadata.getPathFromRoot()
+                            + ". Ignoring property. Existing non property node belongs to (" + String.join(",", closestMetadata
+                            .getBelongsTo()) + "), New property belongs to "
                             + containerArchiveOrFileRef);
                 }
             } else {
                 if (!closestMetadata.isProperty()) {
                     log.warn(
                             "Detected conflict between a new metadata property & existing non property node for suggestion path "
-                                    + closestMetadata.getPathFromRoot(module)
-                                    + ". Ignoring property. Existing non property node belongs to (" + closestMetadata
-                                    .getBelongsTo().stream().collect(joining(",")) + "), New property belongs to "
+                                    + closestMetadata.getPathFromRoot()
+                                    + ". Ignoring property. Existing non property node belongs to (" + String.join(",", closestMetadata
+                                    .getBelongsTo()) + "), New property belongs to "
                                     + containerArchiveOrFileRef);
                 } else {
                     closestMetadata.addRefCascadeTillRoot(containerArchiveOrFileRef);
                     log.debug("Detected a duplicate metadata property for suggestion path " + closestMetadata
-                            .getPathFromRoot(module) + ". Ignoring property. Existing property belongs to ("
-                            + closestMetadata.getBelongsTo().stream().collect(joining(","))
+                            .getPathFromRoot() + ". Ignoring property. Existing property belongs to ("
+                            + String.join(",", closestMetadata.getBelongsTo())
                             + "), New property belongs to " + containerArchiveOrFileRef);
                 }
             }
@@ -589,7 +574,7 @@ public class SuggestionServiceImpl implements SuggestionService {
 
             if (closestMetadata.isProperty()) {
                 log.warn("Detected conflict between an existing metadata property & new springConfigurationMetadataGroup for suggestion path "
-                        + closestMetadata.getPathFromRoot(module)
+                        + closestMetadata.getPathFromRoot()
                         + ". Ignoring new springConfigurationMetadataGroup. Existing Property belongs to ("
                         + String.join(",", closestMetadata.getBelongsTo())
 //                        + closestMetadata.getBelongsTo().stream().collect(joining(","))

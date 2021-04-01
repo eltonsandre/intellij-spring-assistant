@@ -15,56 +15,56 @@ import static in.oneton.idea.spring.assistant.plugin.misc.PsiCustomUtil.getSugge
 @UtilityClass
 public final class ClassSuggestionNodeFactory {
 
-  static ClassMetadata newClassMetadata(@NotNull PsiType type) {
-    SuggestionNodeType nodeType = getSuggestionNodeType(type);
-    switch (nodeType) {
-      case BOOLEAN:
-        return new BooleanClassMetadata();
-      case BYTE:
-      case SHORT:
-      case INT:
-      case LONG:
-      case FLOAT:
-      case DOUBLE:
-      case CHAR:
-      case STRING:
-        return new DummyClassMetadata(nodeType);
-      case ENUM:
-        return new EnumClassMetadata((PsiClassType) type);
-      case ITERABLE:
-        return new IterableClassMetadata((PsiClassType) type);
-      case MAP:
-        return new MapClassMetadata((PsiClassType) type);
-      case KNOWN_CLASS:
-        return new GenericClassMetadata((PsiClassType) type);
-      case UNKNOWN_CLASS:
-        return new DummyClassMetadata(nodeType);
-      default:
-        throw new IllegalStateException(
-            "Class suggestion node for the specified class " + type + " is undefined");
-    }
-  }
-
-  @NotNull
-  public static MetadataProxy newMetadataProxy(Module module, @NotNull PsiType type) {
-    if (type instanceof PsiArrayType) {
-      return new ArrayMetadataProxy(module, (PsiArrayType) type);
-    } else if (type instanceof PsiPrimitiveType) {
-      PsiPrimitiveType primitiveType = (PsiPrimitiveType) type;
-      type = getBoxedTypeFromPrimitiveType(module, primitiveType);
+    static ClassMetadata newClassMetadata(@NotNull PsiType type) {
+        SuggestionNodeType nodeType = getSuggestionNodeType(type);
+        switch (nodeType) {
+            case BOOLEAN:
+                return new BooleanClassMetadata();
+            case BYTE:
+            case SHORT:
+            case INT:
+            case LONG:
+            case FLOAT:
+            case DOUBLE:
+            case CHAR:
+            case STRING:
+                return new DummyClassMetadata(nodeType);
+            case ENUM:
+                return new EnumClassMetadata((PsiClassType) type);
+            case ITERABLE:
+                return new IterableClassMetadata((PsiClassType) type);
+            case MAP:
+                return new MapClassMetadata((PsiClassType) type);
+            case KNOWN_CLASS:
+                return new GenericClassMetadata((PsiClassType) type);
+            case UNKNOWN_CLASS:
+                return new DummyClassMetadata(nodeType);
+            default:
+                throw new IllegalStateException(
+                        "Class suggestion node for the specified class " + type + " is undefined");
+        }
     }
 
-    if (type instanceof PsiClassType) {
-      SuggestionNodeType suggestionNodeType = getSuggestionNodeType(type);
-      if (suggestionNodeType == SuggestionNodeType.MAP) {
-        return new MapClassMetadataProxy((PsiClassType) type);
-      } else {
-        return new ClassMetadataProxy((PsiClassType) type);
-      }
-    }
+    @NotNull
+    public static MetadataProxy newMetadataProxy(Module module, @NotNull PsiType type) {
+        if (type instanceof PsiArrayType) {
+            return new ArrayMetadataProxy(module, (PsiArrayType) type);
+        } else if (type instanceof PsiPrimitiveType) {
+            PsiPrimitiveType primitiveType = (PsiPrimitiveType) type;
+            type = getBoxedTypeFromPrimitiveType(module, primitiveType);
+        }
 
-    throw new IllegalAccessError(
-        "Supports only PsiArrayType, PsiPrimitiveType & PsiClassType types");
-  }
+        if (type instanceof PsiClassType) {
+            SuggestionNodeType suggestionNodeType = getSuggestionNodeType(type);
+            if (suggestionNodeType == SuggestionNodeType.MAP) {
+                return new MapClassMetadataProxy((PsiClassType) type);
+            } else {
+                return new ClassMetadataProxy((PsiClassType) type);
+            }
+        }
+
+        throw new IllegalAccessError(
+                "Supports only PsiArrayType, PsiPrimitiveType & PsiClassType types");
+    }
 
 }

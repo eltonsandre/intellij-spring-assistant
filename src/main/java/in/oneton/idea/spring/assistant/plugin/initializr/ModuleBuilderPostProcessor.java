@@ -6,12 +6,12 @@ import com.intellij.openapi.module.Module;
 import static com.intellij.openapi.extensions.ExtensionPointName.create;
 
 public interface ModuleBuilderPostProcessor {
-  ExtensionPointName<ModuleBuilderPostProcessor> EXTENSION_POINT_NAME =
-      create("spring.assistant.initializr.moduleBuilderPostProcessor");
+    ExtensionPointName<ModuleBuilderPostProcessor> EXTENSION_POINT_NAME =
+            create("spring.assistant.initializr.moduleBuilderPostProcessor");
 
-  /**
-   * @param module module
-   * @return true if project is imported, false otherwise
-   */
-  boolean postProcess(Module module);
+    /**
+     * @param module module
+     * @return true if project is imported, false otherwise
+     */
+    boolean postProcess(Module module);
 }

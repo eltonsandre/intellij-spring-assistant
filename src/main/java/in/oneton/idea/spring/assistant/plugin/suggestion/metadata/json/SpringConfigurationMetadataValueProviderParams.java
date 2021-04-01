@@ -7,6 +7,6 @@ import lombok.Data;
  */
 @Data
 public class SpringConfigurationMetadataValueProviderParams {
-  private String target;
-  private boolean concrete;
+    private String target;
+    private boolean concrete;
 }
