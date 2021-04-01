@@ -20,6 +20,9 @@ package in.oneton.idea.spring.assistant.plugin.initializr.metadata.io.spring.ini
  */
 
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+
 /**
  * Define a {@link Version} range. A square bracket "[" or "]" denotes an inclusive
  * end of the range and a round bracket "(" or ")" denotes an exclusive end of the
@@ -36,114 +39,105 @@ package in.oneton.idea.spring.assistant.plugin.initializr.metadata.io.spring.ini
  *
  * @author Stephane Nicoll
  */
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class VersionRange {
 
-  final Version lowerVersion;
-  final boolean lowerInclusive;
-  final Version higherVersion;
-  final boolean higherInclusive;
+    final Version lowerVersion;
+    final boolean lowerInclusive;
+    final Version higherVersion;
+    final boolean higherInclusive;
 
-  // For Jackson
-  @SuppressWarnings("unused")
-  private VersionRange() {
-    this(null, false, null, false);
-  }
-
-  protected VersionRange(Version lowerVersion, boolean lowerInclusive, Version higherVersion,
-      boolean higherInclusive) {
-    this.lowerVersion = lowerVersion;
-    this.lowerInclusive = lowerInclusive;
-    this.higherVersion = higherVersion;
-    this.higherInclusive = higherInclusive;
-  }
-
-  public VersionRange(Version startingVersion) {
-    this(startingVersion, true, null, false);
-  }
-
-  /**
-   * Specify if the {@link Version} matches this range. Returns {@code true}
-   * if the version is contained within this range, {@code false} otherwise.
-   */
-  public boolean match(Version version) {
-    assert version != null;
-    int lower = lowerVersion.compareTo(version);
-    if (lower > 0) {
-      return false;
-    } else if (!lowerInclusive && lower == 0) {
-      return false;
+    public VersionRange(String rangeText) {
+        VersionRange range = VersionParser.DEFAULT.parseRange(rangeText);
+        this.lowerVersion = range.lowerVersion;
+        this.lowerInclusive = range.lowerInclusive;
+        this.higherVersion = range.higherVersion;
+        this.higherInclusive = range.higherInclusive;
     }
-    if (higherVersion != null) {
-      int higher = higherVersion.compareTo(version);
-      if (higher < 0) {
-        return false;
-      } else
-        return higherInclusive || higher != 0;
+
+    /**
+     * Specify if the {@link Version} matches this range. Returns {@code true}
+     * if the version is contained within this range, {@code false} otherwise.
+     */
+    public boolean match(Version version) {
+        assert version != null;
+        int lower = lowerVersion.compareTo(version);
+        if (lower > 0) {
+            return false;
+        } else if (!lowerInclusive && lower == 0) {
+            return false;
+        }
+        if (higherVersion != null) {
+            int higher = higherVersion.compareTo(version);
+            if (higher < 0) {
+                return false;
+            } else
+                return higherInclusive || higher != 0;
+        }
+        return true;
     }
-    return true;
-  }
 
-  public Version getLowerVersion() {
-    return lowerVersion;
-  }
-
-  public boolean isLowerInclusive() {
-    return lowerInclusive;
-  }
-
-  public Version getHigherVersion() {
-    return higherVersion;
-  }
-
-  public boolean isHigherInclusive() {
-    return higherInclusive;
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    if (lowerVersion != null) {
-      sb.append(lowerInclusive ? ">=" : ">").append(lowerVersion);
+    public Version getLowerVersion() {
+        return lowerVersion;
     }
-    if (higherVersion != null) {
-      sb.append(" and ").append(higherInclusive ? "<=" : "<").append(higherVersion);
+
+    public boolean isLowerInclusive() {
+        return lowerInclusive;
     }
-    return sb.toString();
-  }
 
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + (higherInclusive ? 1231 : 1237);
-    result = prime * result + ((higherVersion == null) ? 0 : higherVersion.hashCode());
-    result = prime * result + (lowerInclusive ? 1231 : 1237);
-    result = prime * result + ((lowerVersion == null) ? 0 : lowerVersion.hashCode());
-    return result;
-  }
+    public Version getHigherVersion() {
+        return higherVersion;
+    }
 
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
-    VersionRange other = (VersionRange) obj;
-    if (higherInclusive != other.higherInclusive)
-      return false;
-    if (higherVersion == null) {
-      if (other.higherVersion != null)
-        return false;
-    } else if (!higherVersion.equals(other.higherVersion))
-      return false;
-    if (lowerInclusive != other.lowerInclusive)
-      return false;
-    if (lowerVersion == null) {
-      return other.lowerVersion == null;
-    } else
-      return lowerVersion.equals(other.lowerVersion);
-  }
+    public boolean isHigherInclusive() {
+        return higherInclusive;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        if (lowerVersion != null) {
+            sb.append(lowerInclusive ? ">=" : ">").append(lowerVersion);
+        }
+        if (higherVersion != null) {
+            sb.append(" and ").append(higherInclusive ? "<=" : "<").append(higherVersion);
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (higherInclusive ? 1231 : 1237);
+        result = prime * result + ((higherVersion == null) ? 0 : higherVersion.hashCode());
+        result = prime * result + (lowerInclusive ? 1231 : 1237);
+        result = prime * result + ((lowerVersion == null) ? 0 : lowerVersion.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        VersionRange other = (VersionRange) obj;
+        if (higherInclusive != other.higherInclusive)
+            return false;
+        if (higherVersion == null) {
+            if (other.higherVersion != null)
+                return false;
+        } else if (!higherVersion.equals(other.higherVersion))
+            return false;
+        if (lowerInclusive != other.lowerInclusive)
+            return false;
+        if (lowerVersion == null) {
+            return other.lowerVersion == null;
+        } else
+            return lowerVersion.equals(other.lowerVersion);
+    }
 
 }

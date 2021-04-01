@@ -19,34 +19,34 @@ import static java.util.Arrays.asList;
 @Getter
 @Builder
 public class DependencyGroupAndDependency implements Indexable {
-  private InitializerMetadata.DependencyComposite.DependencyGroup group;
-  private InitializerMetadata.DependencyComposite.DependencyGroup.Dependency dependency;
-
-  @Override
-  public List<String> getFields() {
-    return asList(group.getName(), dependency.getName(), dependency.getDescription());
-  }
-
-  static class DependencyGroupAndDependencyAdapter
-      implements IndexAdapter<DependencyGroupAndDependency> {
-    private FuzzyIndex<DependencyGroupAndDependency> index = new PatriciaTrie<>();
+    private final InitializerMetadata.DependencyComposite.DependencyGroup group;
+    private final InitializerMetadata.DependencyComposite.DependencyGroup.Dependency dependency;
 
     @Override
-    public Collection<ScoredObject<DependencyGroupAndDependency>> get(String token) {
-      // TODO: Not sure the value of threshold here :). Following sample from https://github.com/fmmfonseca/completely/blob/master/sample/src/main/java/com/miguelfonseca/completely/SampleAdapter.java
-      // Set threshold according to the token length
-      double threshold = Math.log(Math.max(token.length() - 1, 1));
-      return index.getAny(new EditDistanceAutomaton(token, threshold));
+    public List<String> getFields() {
+        return asList(group.getName(), dependency.getName(), dependency.getDescription());
     }
 
-    @Override
-    public boolean put(String token, @Nullable DependencyGroupAndDependency value) {
-      return index.put(token, value);
-    }
+    static class DependencyGroupAndDependencyAdapter
+            implements IndexAdapter<DependencyGroupAndDependency> {
+        private final FuzzyIndex<DependencyGroupAndDependency> index = new PatriciaTrie<>();
 
-    @Override
-    public boolean remove(DependencyGroupAndDependency value) {
-      return index.remove(value);
+        @Override
+        public Collection<ScoredObject<DependencyGroupAndDependency>> get(String token) {
+            // TODO: Not sure the value of threshold here :). Following sample from https://github.com/fmmfonseca/completely/blob/master/sample/src/main/java/com/miguelfonseca/completely/SampleAdapter.java
+            // Set threshold according to the token length
+            double threshold = Math.log(Math.max(token.length() - 1, 1));
+            return index.getAny(new EditDistanceAutomaton(token, threshold));
+        }
+
+        @Override
+        public boolean put(String token, @Nullable DependencyGroupAndDependency value) {
+            return index.put(token, value);
+        }
+
+        @Override
+        public boolean remove(DependencyGroupAndDependency value) {
+            return index.remove(value);
+        }
     }
-  }
 }

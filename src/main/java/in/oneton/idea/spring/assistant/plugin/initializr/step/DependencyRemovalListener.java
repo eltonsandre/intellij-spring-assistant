@@ -4,5 +4,5 @@ import in.oneton.idea.spring.assistant.plugin.initializr.metadata.InitializerMet
 import org.jetbrains.annotations.NotNull;
 
 public interface DependencyRemovalListener {
-  void onDependencyRemoved(@NotNull Dependency dependency);
+    void onDependencyRemoved(@NotNull Dependency dependency);
 }

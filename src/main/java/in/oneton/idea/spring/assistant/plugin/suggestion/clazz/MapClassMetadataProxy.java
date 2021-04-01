@@ -15,44 +15,44 @@ import java.util.SortedSet;
 
 public class MapClassMetadataProxy extends ClassMetadataProxy {
 
-  MapClassMetadataProxy(@NotNull PsiClassType type) {
-    super(type);
-  }
+    MapClassMetadataProxy(@NotNull PsiClassType type) {
+        super(type);
+    }
 
-  @Nullable
-  public SortedSet<Suggestion> findChildKeySuggestionForQueryPrefix(Module module,
-      FileType fileType, List<SuggestionNode> matchesRootTillMe, int numOfAncestors,
-      String[] querySegmentPrefixes, int querySegmentPrefixStartIndex) {
-    return findChildKeySuggestionForQueryPrefix(module, fileType, matchesRootTillMe, numOfAncestors,
-        querySegmentPrefixes, querySegmentPrefixStartIndex, null);
-  }
+    @Nullable
+    public SortedSet<Suggestion> findChildKeySuggestionForQueryPrefix(Module module,
+                                                                      FileType fileType, List<SuggestionNode> matchesRootTillMe, int numOfAncestors,
+                                                                      String[] querySegmentPrefixes, int querySegmentPrefixStartIndex) {
+        return findChildKeySuggestionForQueryPrefix(module, fileType, matchesRootTillMe, numOfAncestors,
+                querySegmentPrefixes, querySegmentPrefixStartIndex, null);
+    }
 
-  public SortedSet<Suggestion> findChildKeySuggestionForQueryPrefix(Module module,
-      FileType fileType, List<SuggestionNode> matchesRootTillMe, int numOfAncestors,
-      String[] querySegmentPrefixes, int querySegmentPrefixStartIndex,
-      Set<String> siblingsToExclude) {
-    return doWithTargetAndReturn(module, target -> {
-      assert target instanceof MapClassMetadata;
-      return MapClassMetadata.class.cast(target)
-          .findChildKeySuggestionForQueryPrefix(module, fileType, matchesRootTillMe, numOfAncestors,
-              querySegmentPrefixes, querySegmentPrefixStartIndex, siblingsToExclude);
-    }, null);
-  }
+    public SortedSet<Suggestion> findChildKeySuggestionForQueryPrefix(Module module,
+                                                                      FileType fileType, List<SuggestionNode> matchesRootTillMe, int numOfAncestors,
+                                                                      String[] querySegmentPrefixes, int querySegmentPrefixStartIndex,
+                                                                      Set<String> siblingsToExclude) {
+        return doWithTargetAndReturn(module, target -> {
+            assert target instanceof MapClassMetadata;
+            return ((MapClassMetadata) target)
+                    .findChildKeySuggestionForQueryPrefix(module, fileType, matchesRootTillMe, numOfAncestors,
+                            querySegmentPrefixes, querySegmentPrefixStartIndex, siblingsToExclude);
+        }, null);
+    }
 
-  @Nullable
-  public PsiType getMapKeyType(Module module) {
-    return doWithTargetAndReturn(module, target -> {
-      assert target instanceof MapClassMetadata;
-      return MapClassMetadata.class.cast(target).getKeyType();
-    }, null);
-  }
+    @Nullable
+    public PsiType getMapKeyType(Module module) {
+        return doWithTargetAndReturn(module, target -> {
+            assert target instanceof MapClassMetadata;
+            return ((MapClassMetadata) target).getKeyType();
+        }, null);
+    }
 
-  @Nullable
-  public PsiType getMapValueType(Module module) {
-    return doWithTargetAndReturn(module, target -> {
-      assert target instanceof MapClassMetadata;
-      return MapClassMetadata.class.cast(target).getValueType();
-    }, null);
-  }
+    @Nullable
+    public PsiType getMapValueType(Module module) {
+        return doWithTargetAndReturn(module, target -> {
+            assert target instanceof MapClassMetadata;
+            return ((MapClassMetadata) target).getValueType();
+        }, null);
+    }
 
 }

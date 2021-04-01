@@ -7,9 +7,9 @@ import org.jetbrains.yaml.YAMLLanguage;
 
 public class YamlCompletionContributor extends CompletionContributor {
 
-  public YamlCompletionContributor() {
-    extend(CompletionType.BASIC, PlatformPatterns.psiElement().withLanguage(YAMLLanguage.INSTANCE),
-        new YamlCompletionProvider());
-  }
+    public YamlCompletionContributor() {
+        extend(CompletionType.BASIC, PlatformPatterns.psiElement().withLanguage(YAMLLanguage.INSTANCE),
+                new YamlCompletionProvider());
+    }
 
 }

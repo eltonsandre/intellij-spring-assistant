@@ -105,8 +105,8 @@ import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(of = "originalName")
-@EqualsAndHashCode(of = "name", callSuper = false)
+@ToString(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public class MetadataNonPropertySuggestionNode extends MetadataSuggestionNode {
 
     private static final Logger log = Logger.getInstance(MetadataNonPropertySuggestionNode.class);
@@ -114,10 +114,12 @@ public class MetadataNonPropertySuggestionNode extends MetadataSuggestionNode {
     /**
      * Sanitised name used for lookup. `-`, `_` are removed, upper cased characters are converted to lower case
      */
+    @EqualsAndHashCode.Include
     private String name;
     /**
      * Section of the group/PROPERTY name. Sole purpose of this is to split all properties into their individual part
      */
+    @ToString.Include
     private String originalName;
 
     // TODO: Make sure that this will be part of search only if type & sourceType are part of the class path
@@ -310,7 +312,7 @@ public class MetadataNonPropertySuggestionNode extends MetadataSuggestionNode {
     private SortedSet<Suggestion> lookingForConcreteNode(final Module module, final FileType fileType, final List<SuggestionNode> matchesRootTillMe, final int numOfAncestors, final String[] querySegmentPrefixes, final int querySegmentPrefixStartIndex) {
         if (isGroup()) {
             // If we have only one child, lets send the child value directly instead of this node. This way user does not need trigger suggestion for level, esp. when we know there will is only be one child
-            if (hasOnlyOneChild(module)) {
+            if (hasOnlyOneChild()) {
                 assert childrenTrie != null;
                 return addChildToMatchesAndSearchInNextLevel(module, fileType, matchesRootTillMe,
                         numOfAncestors, querySegmentPrefixes, querySegmentPrefixStartIndex,
@@ -329,7 +331,7 @@ public class MetadataNonPropertySuggestionNode extends MetadataSuggestionNode {
     }
 
     @Override
-    protected boolean hasOnlyOneChild(Module module) {
+    protected boolean hasOnlyOneChild() {
         return childrenTrie != null && childrenTrie.size() == 1;
         //     && childrenTrie.values().stream()
         //        .allMatch(MetadataSuggestionNode::hasOnlyOneChild)
@@ -342,7 +344,7 @@ public class MetadataNonPropertySuggestionNode extends MetadataSuggestionNode {
                 .append("\n");
         if (childLookup != null) {
             childLookup.forEach(
-                    (k, v) -> builder.append(v.toTree().trim().replaceAll("^", "  ").replaceAll("\n", "\n  "))
+                    (k, v) -> builder.append(v.toTree().trim().replaceAll("\\^", "  ").replaceAll("\n", "\n  "))
                             .append("\n"));
         }
         return builder.toString();
@@ -507,7 +509,7 @@ public class MetadataNonPropertySuggestionNode extends MetadataSuggestionNode {
         String rawPathSegment = rawPathSegments[startIndex];
         String pathSegment = SuggestionNode.sanitise(rawPathSegment);
         MetadataNonPropertySuggestionNode childNode =
-                MetadataNonPropertySuggestionNode.class.cast(childLookup.get(pathSegment));
+                (MetadataNonPropertySuggestionNode) childLookup.get(pathSegment);
         if (childNode == null) {
             childNode = MetadataNonPropertySuggestionNode.newInstance(rawPathSegment, this, belongsTo);
             childNode.setParent(this);

@@ -1,7 +1,8 @@
 package in.oneton.idea.spring.assistant.plugin.suggestion.metadata.json;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiType;
 import in.oneton.idea.spring.assistant.plugin.misc.GenericUtil;
@@ -61,7 +62,7 @@ public class SpringConfigurationMetadataProperty
     private String name;
     @Nullable
     @Setter
-    @SerializedName("type")
+    @JsonProperty("type")
     private String className;
     @Nullable
     @Setter
@@ -96,7 +97,7 @@ public class SpringConfigurationMetadataProperty
      * If the property of type map, the property can have both keys & values. This hint represents value
      */
     @Nullable
-    @Expose(deserialize = false)
+    @JsonIgnore
     private SpringConfigurationMetadataHint valueHint;
 
     /**
@@ -129,10 +130,10 @@ public class SpringConfigurationMetadataProperty
                     return matchesRootTillParentNode;
 
                 } else if (!isMapWithPredefinedValues()) {
-                        return doWithDelegateOrReturnNull(module, metadataProxy -> metadataProxy
-                                .findDeepestSuggestionNode(module, matchesRootTillParentNode, pathSegments,
-                                        pathSegmentStartIndex));
-                    }
+                    return doWithDelegateOrReturnNull(module, metadataProxy -> metadataProxy
+                            .findDeepestSuggestionNode(module, matchesRootTillParentNode, pathSegments,
+                                    pathSegmentStartIndex));
+                }
             }
         }
 
@@ -352,6 +353,9 @@ public class SpringConfigurationMetadataProperty
             Collection<SpringConfigurationMetadataHintValue> matches,
             @Nullable Set<String> siblingsToExclude) {
         Stream<SpringConfigurationMetadataHintValue> matchesStream;
+        if (matches == null) {
+            return Stream.empty();
+        }
         if (siblingsToExclude != null) {
             Set<SpringConfigurationMetadataHintValue> exclusionMembers =
                     siblingsToExclude.stream().map(hintFindValueAgainst::findHintValueWithName)
@@ -404,7 +408,8 @@ public class SpringConfigurationMetadataProperty
     @Nullable
     private <T> T doWithDelegateOrReturnNull(Module module,
                                              MetadataProxyInvokerWithReturnValue<T> invoker) {
-        return doWithDelegateOrReturnDefault(module, invoker, null);
+        doWithDelegateOrReturnDefault(module, invoker, null);
+        return null;
     }
 
     private <T> T doWithMapDelegateOrReturnNull(Module module,
@@ -412,7 +417,7 @@ public class SpringConfigurationMetadataProperty
         MetadataProxy delegate = getDelegate(module);
         if (delegate != null) {
             assert delegate instanceof MapClassMetadataProxy;
-            return invoker.invoke(MapClassMetadataProxy.class.cast(delegate));
+            return invoker.invoke((MapClassMetadataProxy) delegate);
         }
         return null;
     }
@@ -450,7 +455,7 @@ public class SpringConfigurationMetadataProperty
         if (nodeType == MAP) {
             return doWithDelegateOrReturnNull(module, delegate -> {
                 assert delegate instanceof MapClassMetadataProxy;
-                return MapClassMetadataProxy.class.cast(delegate).getMapKeyType(module);
+                return ((MapClassMetadataProxy) delegate).getMapKeyType(module);
             });
         }
         return null;
@@ -462,7 +467,7 @@ public class SpringConfigurationMetadataProperty
         if (nodeType == MAP) {
             return doWithDelegateOrReturnNull(module, delegate -> {
                 assert delegate instanceof MapClassMetadataProxy;
-                return MapClassMetadataProxy.class.cast(delegate).getMapValueType(module);
+                return ((MapClassMetadataProxy) delegate).getMapValueType(module);
             });
         }
         return null;
@@ -512,7 +517,7 @@ public class SpringConfigurationMetadataProperty
                                                                       List<SuggestionNode> matchesRootTillMe, int numOfAncestors, String[] querySegmentPrefixes,
                                                                       int querySegmentPrefixStartIndex) {
             return doWithMapDelegateOrReturnNull(module,
-                    delegate -> MapClassMetadataProxy.class.cast(delegate)
+                    delegate -> ((MapClassMetadataProxy) delegate)
                             .findChildKeySuggestionForQueryPrefix(module, fileType, matchesRootTillMe,
                                     numOfAncestors, querySegmentPrefixes, querySegmentPrefixStartIndex));
         }
@@ -523,7 +528,7 @@ public class SpringConfigurationMetadataProperty
                                                                       List<SuggestionNode> matchesRootTillMe, int numOfAncestors, String[] querySegmentPrefixes,
                                                                       int querySegmentPrefixStartIndex, @Nullable Set<String> siblingsToExclude) {
             return doWithMapDelegateOrReturnNull(module,
-                    delegate -> MapClassMetadataProxy.class.cast(delegate)
+                    delegate -> ((MapClassMetadataProxy) delegate)
                             .findChildKeySuggestionForQueryPrefix(module, fileType, matchesRootTillMe,
                                     numOfAncestors, querySegmentPrefixes, querySegmentPrefixStartIndex,
                                     siblingsToExclude));

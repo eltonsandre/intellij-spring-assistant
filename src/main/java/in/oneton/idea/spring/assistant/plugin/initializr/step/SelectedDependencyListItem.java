@@ -10,27 +10,27 @@ import static com.intellij.icons.AllIcons.Modules.ExcludeRoot;
 
 public class SelectedDependencyListItem {
 
-  private SelectedDependencyListItemListener listener;
+    private SelectedDependencyListItemListener listener;
 
-  private InplaceButton deleteButton;
-  private JBLabel nameLabel;
-  private JPanel root;
+    private InplaceButton deleteButton;
+    private JBLabel nameLabel;
+    private JPanel root;
 
-  public void init(String name, SelectedDependencyListItemListener listener) {
-    this.listener = listener;
-    this.nameLabel.setText(name);
-  }
+    public void init(String name, SelectedDependencyListItemListener listener) {
+        this.listener = listener;
+        this.nameLabel.setText(name);
+    }
 
-  private void createUIComponents() {
-    this.deleteButton = new InplaceButton(new IconButton("Click to delete", ExcludeRoot, ExcludeRoot), e -> this.listener.onDeleteClicked());
-  }
+    private void createUIComponents() {
+        this.deleteButton = new InplaceButton(new IconButton("Click to delete", ExcludeRoot, ExcludeRoot), e -> this.listener.onDeleteClicked());
+    }
 
-  public JPanel getRoot() {
-    return this.root;
-  }
+    public JPanel getRoot() {
+        return this.root;
+    }
 
-  interface SelectedDependencyListItemListener {
-    void onDeleteClicked();
-  }
+    interface SelectedDependencyListItemListener {
+        void onDeleteClicked();
+    }
 
 }
