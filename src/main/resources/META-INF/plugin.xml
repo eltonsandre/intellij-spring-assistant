@@ -21,7 +21,7 @@
         Fix and refactor:
             - fix bugs and refactor build.gradle upgrade dependence versions
             - upgrade JDK 11
-            - test: IntelliJ IDEA 2020.3.2 (Community Edition) Build #IC-203.xx
+            - test: IntelliJ IDEA 2020.3.3 (Community Edition) Build #IC-203.xx
           ]]>]
     </change-notes>
 
@@ -42,11 +42,23 @@
         <completion.contributor language="yaml"
                                 implementationClass="in.oneton.idea.spring.assistant.plugin.suggestion.completion.YamlCompletionContributor"/>
 
-        <!--<completion.contributor language="Properties"-->
-        <!--implementationClass="in.oneton.idea.spring.assistant.plugin.suggestion.completion.PropertiesCompletionContributor"/>-->
+        <completion.contributor language="Properties"
+                                implementationClass="in.oneton.idea.spring.assistant.plugin.suggestion.completion.PropertiesCompletionContributor"/>
 
-        <documentationProvider
-                implementation="in.oneton.idea.spring.assistant.plugin.suggestion.completion.YamlDocumentationProvider"/>
+        <lang.documentationProvider language="yaml"
+                                    implementationClass="in.oneton.idea.spring.assistant.plugin.suggestion.completion.YamlDocumentationProvider"/>
+
+        <lang.documentationProvider id="properties" language="Properties"
+                                    implementationClass="in.oneton.idea.spring.assistant.plugin.suggestion.completion.PropertiesDocumentationProvider"/>
+
+        <!--        <documentationProvider-->
+        <!--                implementation="in.oneton.idea.spring.assistant.plugin.suggestion.completion.YamlDocumentationProvider"/>-->
+
+        <psi.referenceContributor language="Properties"
+                                  implementation="in.oneton.idea.spring.assistant.plugin.suggestion.completion.PropertiesReferenceContributor"/>
+
+        <!--        <lang.findUsagesProvider language="Properties" order="first"-->
+        <!--                                 implementationClass="in.oneton.idea.spring.assistant.plugin.suggestion.completion.CustomPropertiesFindUsagesProvider"/>-->
 
         <!--<documentationProvider-->
         <!--implementation="in.oneton.idea.spring.assistant.plugin.suggestion.completion.PropertiesDocumentationProvider"/>-->
@@ -70,15 +82,10 @@
                 order="last"/>
     </extensions>
 
-    <project-components>
-        <component>
-            <interface-class>
-                in.oneton.idea.spring.assistant.plugin.suggestion.component.Bootstrap
-            </interface-class>
-            <implementation-class>
-                in.oneton.idea.spring.assistant.plugin.suggestion.component.BootstrapImpl
-            </implementation-class>
-        </component>
-    </project-components>
+
+    <projectListeners>
+        <listener class="in.oneton.idea.spring.assistant.plugin.suggestion.component.Bootstrap"
+                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
+    </projectListeners>
 
 </idea-plugin>

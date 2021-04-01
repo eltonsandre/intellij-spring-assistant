@@ -26,12 +26,12 @@ package in.oneton.idea.spring.assistant.plugin.initializr.metadata.io.spring.ini
 @SuppressWarnings("serial")
 public class InvalidVersionException extends RuntimeException {
 
-  public InvalidVersionException(String message, Throwable cause) {
-    super(message, cause);
-  }
+    public InvalidVersionException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-  public InvalidVersionException(String message) {
-    super(message);
-  }
+    public InvalidVersionException(String message) {
+        super(message);
+    }
 
 }

@@ -223,7 +223,7 @@
                                       </grid>
                                     </constraints>
                                     <properties>
-                                      <background color="-1513240"/>
+                                      <background color="-1"/>
                                     </properties>
                                     <border type="none"/>
                                     <children>

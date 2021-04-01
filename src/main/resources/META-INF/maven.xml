@@ -5,16 +5,10 @@
                 implementation="in.oneton.idea.spring.assistant.plugin.initializr.MavenModuleBuilderPostProcessor"/>
     </extensions>
 
-
-    <project-components>
-        <component>
-            <interface-class>
-                in.oneton.idea.spring.assistant.plugin.suggestion.component.MavenReIndexingDependencyChangeSubscriber
-            </interface-class>
-            <implementation-class>
-                in.oneton.idea.spring.assistant.plugin.suggestion.component.MavenReIndexingDependencyChangeSubscriberImpl
-            </implementation-class>
-        </component>
-    </project-components>
+    <projectListeners>
+        <listener
+                class="in.oneton.idea.spring.assistant.plugin.suggestion.component.MavenReIndexingDependencyChangeSubscriber"
+                topic="com.intellij.openapi.project.ProjectManagerListener"/>
+    </projectListeners>
 
 </idea-plugin>

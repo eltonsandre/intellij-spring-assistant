@@ -4,8 +4,8 @@ import in.oneton.idea.spring.assistant.plugin.initializr.metadata.InitializerMet
 import org.jetbrains.annotations.Nullable;
 
 public interface DependencySelectionChangeListener {
-  /**
-   * @param dependency dependency if selected, null if selection is reset
-   */
-  void onDependencySelected(@Nullable Dependency dependency);
+    /**
+     * @param dependency dependency if selected, null if selection is reset
+     */
+    void onDependencySelected(@Nullable Dependency dependency);
 }

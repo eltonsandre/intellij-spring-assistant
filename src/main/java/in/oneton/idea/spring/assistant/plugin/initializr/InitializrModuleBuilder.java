@@ -2,6 +2,7 @@ package in.oneton.idea.spring.assistant.plugin.initializr;
 
 import com.intellij.ide.util.projectWizard.JavaModuleBuilder;
 import com.intellij.ide.util.projectWizard.ModuleBuilder;
+import com.intellij.ide.util.projectWizard.ModuleNameLocationSettings;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ide.util.projectWizard.SettingsStep;
 import com.intellij.ide.util.projectWizard.WizardContext;
@@ -42,126 +43,125 @@ import static com.intellij.pom.java.LanguageLevel.parse;
 @EqualsAndHashCode(callSuper = true)
 public class InitializrModuleBuilder extends ModuleBuilder {
 
-  public static final String CONTENT_TYPE = "application/vnd.initializr.v2.1+json";
+    public static final String CONTENT_TYPE = "application/vnd.initializr.v2.1+json";
 
-  private ProjectCreationRequest request;
+    private ProjectCreationRequest request;
 
-  @Override
-  public void setupRootModel(final ModifiableRootModel modifiableRootModel) {
-    final Sdk moduleOrProjectSdk = this.getModuleJdk() != null ?
-            this.getModuleJdk() :
-            getInstance(modifiableRootModel.getProject()).getProjectSdk();
-    if (moduleOrProjectSdk != null) {
-      modifiableRootModel.setSdk(moduleOrProjectSdk);
-    }
-
-    final LanguageLevelModuleExtension languageLevelModuleExtension =
-            modifiableRootModel.getModuleExtension(LanguageLevelModuleExtension.class);
-    if (languageLevelModuleExtension != null && moduleOrProjectSdk != null) {
-      if (this.safeGetProjectCreationRequest().isJavaVersionSet()) {
-        final LanguageLevel lastSelectedLanguageLevel =
-                parse(this.safeGetProjectCreationRequest().getJavaVersion().getId());
-        if (lastSelectedLanguageLevel != null) {
-          final JavaSdkVersion lastSelectedJavaSdkVersion = fromLanguageLevel(lastSelectedLanguageLevel);
-          final JavaSdkVersion moduleOrProjectLevelJavaSdkVersion =
-                  getInstance().getVersion(moduleOrProjectSdk);
-          if (moduleOrProjectLevelJavaSdkVersion != null && moduleOrProjectLevelJavaSdkVersion
-                  .isAtLeast(lastSelectedJavaSdkVersion)) {
-            languageLevelModuleExtension.setLanguageLevel(lastSelectedLanguageLevel);
-          }
+    @Override
+    public void setupRootModel(final @NotNull ModifiableRootModel modifiableRootModel) {
+        final Sdk moduleOrProjectSdk = this.getModuleJdk() != null ?
+                this.getModuleJdk() :
+                getInstance(modifiableRootModel.getProject()).getProjectSdk();
+        if (moduleOrProjectSdk != null) {
+            modifiableRootModel.setSdk(moduleOrProjectSdk);
         }
-      }
-    }
 
-    this.doAddContentEntry(modifiableRootModel);
-  }
-
-  @Override
-  @Nullable
-  public ModuleWizardStep modifySettingsStep(@NotNull final SettingsStep settingsStep) {
-    final JTextField moduleNameField = settingsStep.getModuleNameField();
-    if (moduleNameField != null) {
-      moduleNameField.setText(this.request.getArtifactId());
-    }
-
-    return super.modifySettingsStep(settingsStep);
-  }
-
-  @Override
-  public ModuleWizardStep[] createWizardSteps(@NotNull final WizardContext wizardContext,
-                                              @NotNull final ModulesProvider modulesProvider) {
-    return new ModuleWizardStep[]{new ProjectDetailsStep(this, wizardContext),
-            new DependencySelectionStep(this)};
-  }
-
-  @Override
-  @Nullable
-  public ModuleWizardStep getCustomOptionsStep(final WizardContext context, final Disposable parentDisposable) {
-    return new ServerSelectionStep(this);
-  }
-
-  @NotNull
-  @Override
-  public Module createModule(@NotNull final ModifiableModuleModel moduleModel)
-          throws IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
-
-    final Module module = super.createModule(moduleModel);
-
-    getApplication().invokeLater(() -> {
-      ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
-        try {
-          final InitializerDownloader downloader = new InitializerDownloader(this);
-          downloader.execute(ProgressManager.getInstance().getProgressIndicator());
-        } catch (final IOException var2) {
-          getApplication().invokeLater(() -> showErrorDialog("Error: " + var2.getMessage(), "Creation Failed"));
+        final LanguageLevelModuleExtension languageLevelModuleExtension =
+                modifiableRootModel.getModuleExtension(LanguageLevelModuleExtension.class);
+        if (languageLevelModuleExtension != null && moduleOrProjectSdk != null) {
+            if (this.safeGetProjectCreationRequest().isJavaVersionSet()) {
+                final LanguageLevel lastSelectedLanguageLevel =
+                        parse(this.safeGetProjectCreationRequest().getJavaVersion().getId());
+                if (lastSelectedLanguageLevel != null) {
+                    final JavaSdkVersion lastSelectedJavaSdkVersion = fromLanguageLevel(lastSelectedLanguageLevel);
+                    final JavaSdkVersion moduleOrProjectLevelJavaSdkVersion =
+                            getInstance().getVersion(moduleOrProjectSdk);
+                    if (moduleOrProjectLevelJavaSdkVersion != null && moduleOrProjectLevelJavaSdkVersion
+                            .isAtLeast(lastSelectedJavaSdkVersion)) {
+                        languageLevelModuleExtension.setLanguageLevel(lastSelectedLanguageLevel);
+                    }
+                }
+            }
         }
-      }, "Downloading required files...", true, null);
-      final ModuleBuilderPostProcessor[] postProcessors =
-              ModuleBuilderPostProcessor.EXTENSION_POINT_NAME.getExtensions();
-      for (final ModuleBuilderPostProcessor postProcessor : postProcessors) {
-        if (!postProcessor.postProcess(module)) {
-          return;
-        }
-      }
-    }, current());
-    return module;
-  }
 
-  @Override
-  public Icon getNodeIcon() {
-    return Icons.SpringBoot;
-  }
-
-  @Nullable
-  @Override
-  public String getBuilderId() {
-    return "Spring Boot/Cloud Dataflow Initializr";
-  }
-
-  @Override
-  public String getDescription() {
-    return "Bootstrap spring applications using <b>spring boot</b> & <b>spring cloud dataflow</b> starters";
-  }
-
-  @Override
-  public String getPresentableName() {
-    return "Spring Assistant";
-  }
-
-  @Override
-  public String getParentGroup() {
-    return "Build Tools";
-  }
-
-  @Override
-  public ModuleType<JavaModuleBuilder> getModuleType() {
-    return JAVA;
-  }
-
-  public ProjectCreationRequest safeGetProjectCreationRequest() {
-    if (this.request == null) {
-      this.request = new ProjectCreationRequest();
+        this.doAddContentEntry(modifiableRootModel);
     }
-    return this.request;
-  }
+
+    @Override
+    @Nullable
+    public ModuleWizardStep modifySettingsStep(@NotNull final SettingsStep settingsStep) {
+        ModuleNameLocationSettings moduleNameLocationSettings = settingsStep.getModuleNameLocationSettings();
+        if (moduleNameLocationSettings != null) {
+            moduleNameLocationSettings.setModuleName(this.request.getArtifactId());
+        }
+        return super.modifySettingsStep(settingsStep);
+    }
+
+    @Override
+    public ModuleWizardStep[] createWizardSteps(@NotNull final WizardContext wizardContext,
+                                                @NotNull final ModulesProvider modulesProvider) {
+        return new ModuleWizardStep[]{new ProjectDetailsStep(this, wizardContext),
+                new DependencySelectionStep(this)};
+    }
+
+    @Override
+    @Nullable
+    public ModuleWizardStep getCustomOptionsStep(final WizardContext context, final Disposable parentDisposable) {
+        return new ServerSelectionStep(this);
+    }
+
+    @NotNull
+    @Override
+    public Module createModule(@NotNull final ModifiableModuleModel moduleModel)
+            throws IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
+
+        final Module module = super.createModule(moduleModel);
+
+        getApplication().invokeLater(() -> {
+            ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
+                try {
+                    final InitializerDownloader downloader = new InitializerDownloader(this);
+                    downloader.execute(ProgressManager.getInstance().getProgressIndicator());
+                } catch (final IOException var2) {
+                    getApplication().invokeLater(() -> showErrorDialog("Error: " + var2.getMessage(), "Creation Failed"));
+                }
+            }, "Downloading required files...", true, null);
+            final ModuleBuilderPostProcessor[] postProcessors =
+                    ModuleBuilderPostProcessor.EXTENSION_POINT_NAME.getExtensions();
+            for (final ModuleBuilderPostProcessor postProcessor : postProcessors) {
+                if (!postProcessor.postProcess(module)) {
+                    return;
+                }
+            }
+        }, current());
+        return module;
+    }
+
+    @Override
+    public Icon getNodeIcon() {
+        return Icons.SpringBoot;
+    }
+
+    @Nullable
+    @Override
+    public String getBuilderId() {
+        return "Spring Boot/Cloud Dataflow Initializr";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Bootstrap spring applications using <b>spring boot</b> & <b>spring cloud dataflow</b> starters";
+    }
+
+    @Override
+    public String getPresentableName() {
+        return "Spring Assistant";
+    }
+
+    @Override
+    public String getParentGroup() {
+        return "Build Tools";
+    }
+
+    @Override
+    public ModuleType<JavaModuleBuilder> getModuleType() {
+        return JAVA;
+    }
+
+    public ProjectCreationRequest safeGetProjectCreationRequest() {
+        if (this.request == null) {
+            this.request = new ProjectCreationRequest();
+        }
+        return this.request;
+    }
 }

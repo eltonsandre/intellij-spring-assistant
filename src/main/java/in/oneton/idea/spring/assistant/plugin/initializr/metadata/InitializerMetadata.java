@@ -1,6 +1,6 @@
 package in.oneton.idea.spring.assistant.plugin.initializr.metadata;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import in.oneton.idea.spring.assistant.plugin.initializr.metadata.InitializerMetadata.DependencyComposite.DependencyGroup.Dependency;
 import in.oneton.idea.spring.assistant.plugin.initializr.metadata.io.spring.initializr.util.Version;
 import in.oneton.idea.spring.assistant.plugin.initializr.metadata.io.spring.initializr.util.VersionRange;
@@ -21,40 +21,40 @@ import java.util.Optional;
 @ToString
 public class InitializerMetadata {
 
-    @SerializedName("dependencies")
+    @JsonProperty("dependencies")
     private DependencyComposite dependencyComposite;
 
-    @SerializedName("type")
+    @JsonProperty("type")
     private ProjectTypeComposite projectTypeComposite;
 
-    @SerializedName("packaging")
+    @JsonProperty("packaging")
     private IdAndNameComposite packagingTypeComposite;
 
-    @SerializedName("javaVersion")
+    @JsonProperty("javaVersion")
     private IdAndNameComposite javaVersionComposite;
 
-    @SerializedName("language")
+    @JsonProperty("language")
     private IdAndNameComposite languageComposite;
 
-    @SerializedName("bootVersion")
+    @JsonProperty("bootVersion")
     private IdAndNameComposite bootVersionComposite;
 
-    @SerializedName("groupId")
+    @JsonProperty("groupId")
     private DefaultValueHolder groupIdHolder;
 
-    @SerializedName("artifactId")
+    @JsonProperty("artifactId")
     private DefaultValueHolder artifactIdHolder;
 
-    @SerializedName("version")
+    @JsonProperty("version")
     private DefaultValueHolder versionHolder;
 
-    @SerializedName("name")
+    @JsonProperty("name")
     private DefaultValueHolder nameHolder;
 
-    @SerializedName("description")
+    @JsonProperty("description")
     private DefaultValueHolder descriptionHolder;
 
-    @SerializedName("packageName")
+    @JsonProperty("packageName")
     private DefaultValueHolder packageNameHolder;
 
 
@@ -66,7 +66,7 @@ public class InitializerMetadata {
     @Data
     public static class DependencyComposite {
 
-        @SerializedName("values")
+        @JsonProperty("values")
         private List<DependencyGroup> groups;
 
         @NotNull
@@ -78,15 +78,13 @@ public class InitializerMetadata {
 
         @Data
         @FieldNameConstants
-        @ToString(onlyExplicitlyIncluded = true)
         @EqualsAndHashCode(onlyExplicitlyIncluded = true)
         public static class DependencyGroup {
 
-            @ToString.Include
             @EqualsAndHashCode.Include
             private String name;
 
-            @SerializedName("values")
+            @JsonProperty("values")
             private List<Dependency> dependencies;
 
 
@@ -103,7 +101,7 @@ public class InitializerMetadata {
                 private VersionRange versionRange;
 
                 @Nullable
-                @SerializedName("_links")
+                @JsonProperty("_links")
                 private DependencyLinksContainer linksContainer;
 
                 @SuppressWarnings("BooleanMethodIsAlwaysInverted")
@@ -116,11 +114,11 @@ public class InitializerMetadata {
                 public static class DependencyLinksContainer {
 
                     @Nullable
-                    @SerializedName("reference")
+                    @JsonProperty("reference")
                     private List<DependencyLink> references;
 
                     @Nullable
-                    @SerializedName("guide")
+                    @JsonProperty("guide")
                     private List<DependencyLink> guides;
 
 
@@ -146,6 +144,11 @@ public class InitializerMetadata {
                     }
                 }
             }
+
+            @Override
+            public String toString() {
+                return name;
+            }
         }
     }
 
@@ -153,26 +156,29 @@ public class InitializerMetadata {
     @Data
     public static class ProjectTypeComposite {
 
-        @SerializedName("default")
+        @JsonProperty("default")
         private String defaultValue;
 
-        @SerializedName("values")
+        @JsonProperty("values")
         private List<ProjectType> types;
 
 
         @Data
-        @ToString(onlyExplicitlyIncluded = true)
         @EqualsAndHashCode(onlyExplicitlyIncluded = true)
         public static class ProjectType implements IdContainer {
 
             @EqualsAndHashCode.Include
             private String id;
 
-            @ToString.Include
             private String name;
 
             private String description;
             private String action;
+
+            @Override
+            public String toString() {
+                return name;
+            }
         }
     }
 
@@ -180,7 +186,7 @@ public class InitializerMetadata {
     @Data
     public static class IdAndNameComposite {
 
-        @SerializedName("default")
+        @JsonProperty("default")
         private String defaultValue;
 
         private List<IdAndName> values;
@@ -188,18 +194,21 @@ public class InitializerMetadata {
 
 
     @Data
-    @ToString(onlyExplicitlyIncluded = true)
     @EqualsAndHashCode(onlyExplicitlyIncluded = true)
     public static class IdAndName implements IdContainer {
 
         @EqualsAndHashCode.Include
         private String id;
 
-        @ToString.Include
         private String name;
 
         public Version parseIdAsVersion() {
             return Version.parse(id);
+        }
+
+        @Override
+        public String toString() {
+            return name;
         }
     }
 
@@ -207,7 +216,7 @@ public class InitializerMetadata {
     @Data
     public static class DefaultValueHolder {
 
-        @SerializedName("default")
+        @JsonProperty("default")
         private String defaultValue;
     }
 
