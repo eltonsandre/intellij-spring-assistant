@@ -1,10 +1,13 @@
 <idea-plugin>
+
     <extensions defaultExtensionNs="com.intellij">
         <externalProjectDataService
                 implementation="in.oneton.idea.spring.assistant.plugin.suggestion.component.GradleReindexingProjectDataService"/>
     </extensions>
+
     <extensions defaultExtensionNs="spring.assistant.initializr">
         <moduleBuilderPostProcessor
                 implementation="in.oneton.idea.spring.assistant.plugin.initializr.GradleModuleBuilderPostProcessor"/>
     </extensions>
+
 </idea-plugin>

@@ -3,7 +3,7 @@
     <id>in.1ton.idea.spring.assistant.plugin</id>
     <name>Spring Assistant</name>
     <!-- Will be auto populated by plugin -->
-    <version>1.1.0</version>
+    <version>1.2.0-RC.1</version>
     <vendor email="dev@1ton.in" url="https://github.com/eltonsandre">
         eltonsandre and Development Team @ 1Ton Technologies
     </vendor>
@@ -20,18 +20,22 @@
     <change-notes>
         <![CDATA[
         Fix and refactor:
-            - fix bugs and refactor build.gradle upgrade dependence versions
-            - upgrade JDK 11
-            - test: IntelliJ IDEA 2020.3.3 (Community Edition) Build #IC-203.xx
-          ]]>]
+         - new feature - link properties
+         - test: IntelliJ IDEA 2021.1 (Community Edition) Build #IC-211.xx
+        ]]>]
     </change-notes>
 
     <idea-version since-build="203"/>
 
+    <depends>com.intellij.java</depends>
+    <depends>com.intellij.properties</depends>
+
     <depends>com.intellij.modules.java</depends>
     <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.platform</depends>
+
     <depends>org.jetbrains.plugins.yaml</depends>
-    <depends>com.intellij.properties</depends>
+
     <depends config-file="maven.xml" optional="true">org.jetbrains.idea.maven</depends>
     <depends config-file="gradle.xml" optional="true">com.intellij.gradle</depends>
     <!--    <depends config-file="gradle.xml" optional="true">org.jetbrains.plugins.gradle</depends>-->
@@ -42,6 +46,8 @@
     </extensionPoints>
 
     <extensions defaultExtensionNs="com.intellij">
+        <gotoDeclarationHandler implementation="in.oneton.idea.spring.assistant.plugin.link.LinkPropertiesKey"/>
+
         <completion.contributor language="yaml"
                                 implementationClass="in.oneton.idea.spring.assistant.plugin.suggestion.completion.YamlCompletionContributor"/>
 

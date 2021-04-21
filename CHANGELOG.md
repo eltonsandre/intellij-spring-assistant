@@ -1,11 +1,15 @@
+### Since 1.2.0-RC.1 (release candidate - 22 Apr 2021):
+
+- WIP
+- new feature - link properties
+- Test: IntelliJ IDEA 2021.1 (Community Edition) Build #IC-211.xx
+
 ### Since 1.1.0 (1 Apr 2021):
 
 - Fixed bugs
 - Improve code and clean code refactors
 - Added support properties auto complete
 - Test: IntelliJ IDEA 2020.3.3 (Community Edition) Build #IC-203.xx
-
-> Plugin [download](dist/intellij-spring-assistant-1.1.0.zip)
 
 ### Since 1.0.0 (1 Fev 2021):
 
