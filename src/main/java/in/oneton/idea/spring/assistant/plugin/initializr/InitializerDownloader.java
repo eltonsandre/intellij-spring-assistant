@@ -57,7 +57,7 @@ class InitializerDownloader {
         indicator.setText("Please wait ...");
         File targetExtractionDir = new File(requireNonNull(builder.getContentEntryPath()));
         if (download.zip) {
-            extract(tempFile, targetExtractionDir, null);
+            extract(tempFile.toPath(), targetExtractionDir.toPath(), null);
             markAsExecutable(targetExtractionDir, "gradlew");
             markAsExecutable(targetExtractionDir, "mvnw");
         } else {
