@@ -11,7 +11,7 @@ buildscript {
 plugins {
     id 'java'
     id 'idea'
-    id 'org.jetbrains.intellij' version '0.6.5'
+    id 'org.jetbrains.intellij' version '0.7.2'
 }
 
 
@@ -46,12 +46,11 @@ dependencies {
 
     implementation 'org.apache.commons:commons-collections4:4.1'
     implementation 'com.miguelfonseca.completely:completely-core:0.8.0'
-    implementation 'com.vladsch.flexmark:flexmark:0.62.2'
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:2.12.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.0.1'
-    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.0.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.0.1'
 }
 
 clean.doFirst {
