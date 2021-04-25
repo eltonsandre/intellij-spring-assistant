@@ -1,5 +1,6 @@
 package com.acme.model;
 
+import jdk.internal.org.jline.utils.Colors;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

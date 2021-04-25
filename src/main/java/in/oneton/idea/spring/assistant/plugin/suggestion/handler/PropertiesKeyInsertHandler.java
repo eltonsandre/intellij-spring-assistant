@@ -4,8 +4,8 @@ import com.google.common.base.Splitter;
 import com.intellij.codeInsight.completion.InsertHandler;
 import com.intellij.codeInsight.completion.InsertionContext;
 import com.intellij.codeInsight.lookup.LookupElement;
-import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.module.Module;
+import in.oneton.idea.spring.assistant.plugin.misc.GenericUtil;
 import in.oneton.idea.spring.assistant.plugin.suggestion.OriginalNameProvider;
 import in.oneton.idea.spring.assistant.plugin.suggestion.Suggestion;
 import in.oneton.idea.spring.assistant.plugin.suggestion.SuggestionNodeType;
@@ -29,86 +29,87 @@ import static in.oneton.idea.spring.assistant.plugin.suggestion.SuggestionNodeTy
 public class PropertiesKeyInsertHandler implements InsertHandler<LookupElement> {
 
     @Override
-    public void handleInsert(@NotNull InsertionContext context, @NotNull LookupElement lookupElement) {
-        if (!nextCharAfterSpacesAndQuotesIsColon(getStringAfterAutoCompletedValue(context))) {
+    public void handleInsert(@NotNull final InsertionContext context, @NotNull final LookupElement lookupElement) {
+        if (!this.nextCharAfterSpacesAndQuotesIsColon(this.getStringAfterAutoCompletedValue(context))) {
 
-            final String existingIndentation = getStringBeforeAutoCompletedValue(context, lookupElement);
-
-            String lookupString = lookupElement.getLookupString();
+            final var existingIndentation = this.getStringBeforeAutoCompletedValue(context, lookupElement);
+            var lookupString = lookupElement.getLookupString();
 
             String pathDotDelimitedRootToLeaf = ((Suggestion) lookupElement.getObject()).getPathDotDelimitedRootToLeaf();
 
-            boolean isArray = false;
+            var isArray = false;
+            if (lookupString.equals(pathDotDelimitedRootToLeaf) && StringUtils.isNotEmpty(existingIndentation)) {
+                String patternString = "^" + pathDotDelimitedRootToLeaf
+                        .replace(GenericUtil.PROP_DOT, "\\.") + "\\[\\d+].*";
 
-            if (lookupString.equals(pathDotDelimitedRootToLeaf)
-                    && StringUtils.isNotEmpty(existingIndentation)) {
+                var pattern = Pattern.compile(patternString);
 
-                String patternString =
-                        "^" + pathDotDelimitedRootToLeaf.replace(".", "\\.") + "\\[\\d+].*";
-
-                Pattern pattern = Pattern.compile(patternString);
-
-                List<String> splitToList = Splitter.on("\n").splitToList(existingIndentation);
-
-                List<String> delimitedPrefixList = splitToList.stream()
+                final List<String> delimitedPrefixList = Splitter.on("\n").splitToList(existingIndentation)
+                        .stream()
                         .filter(prop -> prop.startsWith(pathDotDelimitedRootToLeaf))
                         .collect(Collectors.toList());
 
                 if (CollectionUtils.isNotEmpty(delimitedPrefixList)) {
-
                     isArray = delimitedPrefixList.stream()
                             .allMatch(prop -> pattern.matcher(prop).matches());
                 }
 
             }
 
-            Suggestion suggestion = (Suggestion) lookupElement.getObject();
-            Module module = findModule(context);
-            String suggestionWithCaret =
-                    getSuggestionReplacementWithCaret(module, suggestion, isArray);
-
-            String suggestionWithoutCaret = suggestionWithCaret.replace(CARET, "");
-
-            this.deleteLookupTextAndRetrieveOldValue(context);
-
-            insertStringAtCaret(context.getEditor(),
-                    suggestionWithoutCaret,
-                    false, true,
-                    getCaretIndex(suggestionWithCaret));
+            this.suggestionInsertStringAtCaret(context, lookupElement, isArray);
         }
+
     }
 
-    private void deleteLookupTextAndRetrieveOldValue(InsertionContext context) {
-        deleteLookupPlain(context);
+    private void suggestionInsertStringAtCaret(final InsertionContext context, final @NotNull LookupElement lookupElement, final boolean isArray) {
+        Suggestion suggestion = (Suggestion) lookupElement.getObject();
+        Module module = findModule(context);
+        String suggestionWithCaret = this.getSuggestionReplacementWithCaret(module, suggestion, isArray);
+
+        final String suggestionWithoutCaret = suggestionWithCaret.replace(CARET, StringUtils.EMPTY);
+
+        this.deleteLookupTextAndRetrieveOldValue(context);
+
+        insertStringAtCaret(context.getEditor(),
+                suggestionWithoutCaret,
+                false, true,
+                this.getCaretIndex(suggestionWithCaret));
     }
 
-    private void deleteLookupPlain(InsertionContext context) {
-        Document document = context.getDocument();
+    private void deleteLookupTextAndRetrieveOldValue(final InsertionContext context) {
+        this.deleteLookupPlain(context);
+    }
+
+    private void deleteLookupPlain(final InsertionContext context) {
+        final var document = context.getDocument();
         document.deleteString(context.getStartOffset(), context.getTailOffset());
         context.commitDocument();
     }
 
     @NotNull
-    private String getSuggestionReplacementWithCaret(Module module, Suggestion suggestion, boolean isArray) {
-        StringBuilder builder = new StringBuilder();
-        int i = 0;
-        List<? extends OriginalNameProvider> matchesTopFirst = suggestion.getMatchesForReplacement();
+    private String getSuggestionReplacementWithCaret(final Module module, final Suggestion suggestion, final boolean isArray) {
+        final var builder = new StringBuilder();
+        var i = 0;
+
+        final List<? extends OriginalNameProvider> matchesTopFirst = suggestion.getMatchesForReplacement();
         do {
             OriginalNameProvider nameProvider = matchesTopFirst.get(i);
             builder.append(nameProvider.getOriginalName());
             if (i != matchesTopFirst.size() - 1) {
-                builder.append(".");
+                builder.append(GenericUtil.PROP_DOT);
             }
             i++;
         } while (i < matchesTopFirst.size());
-        String suffix = getPlaceholderSuffixWithCaret(module, suggestion, isArray);
+
+        String suffix = this.getPlaceholderSuffixWithCaret(module, suggestion, isArray);
         builder.append(suffix);
         return builder.toString();
     }
 
     @NotNull
-    private String getPlaceholderSuffixWithCaret(Module module, Suggestion suggestion, boolean isArray) {
-        SuggestionNodeType nodeType = suggestion.getSuggestionNodeType(module);
+    String getPlaceholderSuffixWithCaret(final Module module, final Suggestion suggestion, final boolean isArray) {
+        final SuggestionNodeType nodeType = suggestion.getSuggestionNodeType(module);
+
         if (nodeType == UNDEFINED || nodeType == UNKNOWN_CLASS) {
             return CARET;
         } else if (nodeType.representsLeaf()) {
@@ -129,16 +130,19 @@ public class PropertiesKeyInsertHandler implements InsertHandler<LookupElement> 
 
     @NotNull
     private String getStringAfterAutoCompletedValue(final InsertionContext context) {
-        return context.getDocument().getText().substring(context.getTailOffset());
+        return context.getDocument().getText()
+                .substring(context.getTailOffset());
     }
 
     private boolean nextCharAfterSpacesAndQuotesIsColon(final String string) {
-        for (int i = 0; i < string.length(); i++) {
-            final char c = string.charAt(i);
-            if (c != ' ' && c != '"') {
-                return c == '=';
+        for (var i = 0; i < string.length(); i++) {
+            final var charI = string.charAt(i);
+
+            if (charI != ' ' && charI != '"') {
+                return charI == '=';
             }
         }
+
         return false;
     }
 

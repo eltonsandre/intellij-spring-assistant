@@ -7,7 +7,6 @@ import com.intellij.codeInsight.completion.CompletionUtilCore;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
@@ -20,8 +19,6 @@ import java.util.List;
 import java.util.Objects;
 
 class PropertiesCompletionProvider extends CompletionProvider<CompletionParameters> {
-
-    private static final String PROP_DOT = ".";
 
     @Override
     protected void addCompletions(@NotNull final CompletionParameters completionParameters,
@@ -42,7 +39,7 @@ class PropertiesCompletionProvider extends CompletionProvider<CompletionParamete
 
         Module module = PsiCustomUtil.findModule(element);
 
-        Project project = element.getProject();
+        var project = element.getProject();
 
         SuggestionService service = ServiceManager.getService(project, SuggestionService.class);
 
@@ -58,7 +55,7 @@ class PropertiesCompletionProvider extends CompletionProvider<CompletionParamete
         // For top level element, since there is no parent keyValue would be null
         String origin = GenericUtil.truncateIdeaDummyIdentifier(element);
 
-        int pos = origin.lastIndexOf(PROP_DOT);
+        int pos = origin.lastIndexOf(GenericUtil.PROP_DOT);
 
         String queryWithDotDelimitedPrefixes = origin;
 
@@ -74,7 +71,7 @@ class PropertiesCompletionProvider extends CompletionProvider<CompletionParamete
         List<String> ancestralKeys = GenericUtil.getAncestralKey(text);
 
         suggestions =
-                service.findSuggestionsForQueryPrefix(module, FileType.properties, element, ancestralKeys,
+                service.findSuggestionsForQueryPrefix(module, FileType.PROPERTIES, element, ancestralKeys,
                         queryWithDotDelimitedPrefixes, null);
 
         resultSet = resultSet.withPrefixMatcher(queryWithDotDelimitedPrefixes);

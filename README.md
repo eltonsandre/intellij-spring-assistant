@@ -20,7 +20,7 @@ This plugins provides the following features as of now.
 
 ## Download
 
-[intellij-spring-assistant-1.1.0.zip](dist/intellij-spring-assistant-1.1.0.zip)
+[intellij-spring-assistant-1.2.0-RC.2.zip](dist/intellij-spring-assistant-1.2.0-RC.2.zip)
 
 ## Usage
 
@@ -40,11 +40,11 @@ For this to work, you need to ensure the following steps are followed for your p
 ### Setup for showing ConfigurationProperties as suggestions within current module
 
 1. Make sure `Enable annotation processing` is checked under `Settings > Build, Execution & Deployment > Compiler > Annotation Processors`
-2. Make sure you add the following changes to  to your project
+2. Make sure you add the following changes to to your project
 
-    *For Maven*
+   *For Maven*
 
-    Add the following dependency
+   Add the following dependency
 
     ```xml
     <dependency>
@@ -54,9 +54,10 @@ For this to work, you need to ensure the following steps are followed for your p
     </dependency>
     ```
 
-    *For Gradle*
+   *For Gradle*
 
-    Add the following build configuration. You can use the [propdeps-plugin](https://github.com/spring-gradle-plugins/propdeps-plugin) for `optional` scope (as we dont need `spring-boot-configuration-processor` as a dependency in the generated jar/war)
+   Add the following build configuration. You can use the [propdeps-plugin](https://github.com/spring-gradle-plugins/propdeps-plugin) for `optional`
+   scope (as we dont need `spring-boot-configuration-processor` as a dependency in the generated jar/war)
 
     ```gradle
     dependencies {
@@ -65,7 +66,9 @@ For this to work, you need to ensure the following steps are followed for your p
 
     compileJava.dependsOn(processResources)
     ```
-3. (**OPTIONAL**) If intellij is generating build artfacts to `output` directory instead of gradle's default `build` directory, then you may need to `File | Settings | Build, Execution, Deployment | Build Tools | Gradle | Runner => Delegate IDE build/run actions to gradle` & restart the IDE. This will ensure that gradle plugin generates metadata & Intellij is pointing to it
+3. (**OPTIONAL**) If intellij is generating build artfacts to `output` directory instead of gradle's default `build` directory, then you may need
+   to `File | Settings | Build, Execution, Deployment | Build Tools | Gradle | Runner => Delegate IDE build/run actions to gradle` & restart the IDE.
+   This will ensure that gradle plugin generates metadata & Intellij is pointing to it
 
 > If you want to look at a sample project, look inside [samples](samples/) directory where the above setup is done. These samples allow properties from `@ConfigurationProperties` to be shown as suggestions
 

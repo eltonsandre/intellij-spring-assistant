@@ -4,7 +4,6 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.lang.properties.psi.impl.PropertyKeyImpl;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
@@ -49,7 +48,7 @@ public class PropertiesReferenceContributor extends PsiReferenceContributor {
 
                 String text = property.getText();
 
-                TextRange range = new TextRange(0, text.length());
+                var range = new TextRange(0, text.length());
 
                 return new PsiReference[]{new PropertiesReference(element, range)};
             }
@@ -68,15 +67,15 @@ public class PropertiesReferenceContributor extends PsiReferenceContributor {
         @Override
         public ResolveResult @NotNull [] multiResolve(boolean incompleteCode) {
 
-            Project project = myElement.getProject();
+            var project = this.myElement.getProject();
 
-            PsiFile file = myElement.getContainingFile();
+            PsiFile file = this.myElement.getContainingFile();
 
             SuggestionService service = ServiceManager.getService(project, SuggestionService.class);
 
-            String value = myElement.getText();
+            String value = this.myElement.getText();
 
-            Module module = findModule(myElement);
+            Module module = findModule(this.myElement);
 
             List<String> ancestralKey = GenericUtil.getAncestralKey(value);
 
@@ -107,7 +106,7 @@ public class PropertiesReferenceContributor extends PsiReferenceContributor {
         @Nullable
         @Override
         public PsiElement resolve() {
-            ResolveResult[] resolveResults = multiResolve(false);
+            ResolveResult[] resolveResults = this.multiResolve(false);
             return resolveResults.length == 1 ? resolveResults[0].getElement() : null;
         }
 
@@ -115,13 +114,13 @@ public class PropertiesReferenceContributor extends PsiReferenceContributor {
         @Override
         public Object @NotNull [] getVariants() {
 
-            Project project = myElement.getProject();
+            var project = this.myElement.getProject();
 
             SuggestionService service = ServiceManager.getService(project, SuggestionService.class);
 
-            Module module = findModule(myElement);
+            Module module = findModule(this.myElement);
 
-            String origin = truncateIdeaDummyIdentifier(myElement);
+            String origin = truncateIdeaDummyIdentifier(this.myElement);
 
             int pos = origin.lastIndexOf(".");
 
@@ -137,7 +136,7 @@ public class PropertiesReferenceContributor extends PsiReferenceContributor {
 
             List<LookupElementBuilder> suggestions =
                     service.findSuggestionsForQueryPrefix(module,
-                            FileType.properties, myElement,
+                            FileType.PROPERTIES, this.myElement,
                             GenericUtil.getAncestralKey(origin), queryWithDotDelimitedPrefixes,
                             null);
 

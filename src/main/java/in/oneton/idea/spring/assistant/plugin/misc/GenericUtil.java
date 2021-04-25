@@ -39,6 +39,8 @@ import static java.util.stream.Collectors.joining;
 @UtilityClass
 public class GenericUtil {
 
+    public static final String PROP_DOT = ".";
+
     private static final Pattern PACKAGE_REMOVAL_PATTERN = Pattern.compile("[a-zA-Z_][a-zA-Z_0-9]*\\.");
 
     private static final Pattern GENERIC_SECTION_REMOVAL_PATTERN = Pattern.compile("<(?<commaDelimitedTypes>[^>]+)>");
