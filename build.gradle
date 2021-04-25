@@ -4,7 +4,7 @@ import com.vladsch.flexmark.util.ast.Document
 
 buildscript {
     dependencies {
-        classpath 'com.vladsch.flexmark:flexmark:0.62.2' // '0.28.12'
+        classpath 'com.vladsch.flexmark:flexmark:0.62.2'
     }
 }
 
@@ -16,7 +16,7 @@ plugins {
 
 
 group = 'in.oneton.idea.spring'
-version = '1.1.1'
+version = '1.2.0-RC.3'
 
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
@@ -49,7 +49,7 @@ dependencies {
     implementation 'com.vladsch.flexmark:flexmark:0.62.2'
 
     testImplementation(platform('org.junit:junit-bom:5.7.2'))
-    testImplementation 'org.mockito:mockito-core:3.10.0'
+    testImplementation 'org.mockito:mockito-core:3.11.0'
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
 }
@@ -85,8 +85,8 @@ patchPluginXml {
 String readmeXmlAsHtml() {
     final String readmeContent = new File(rootProject.uri('README.md')).text
     // since these images needs to shown from within intellij, lest put absolute urls so that the images & changelog will be visible
-            .replaceAll("help\\.gif", "https://raw.githubusercontent.com/1tontech/intellij-spring-assistant/" + version + "/help.gif")
-            .replaceAll("CHANGELOG.md", "https://github.com/1tontech/intellij-spring-assistant/blob/" + version + "/CHANGELOG.md")
+            .replaceAll("help\\.gif", "https://raw.githubusercontent.com/eltonsandre/intellij-spring-assistant/" + version + "/help.gif")
+            .replaceAll("CHANGELOG.md", "https://github.com/eltonsandre/intellij-spring-assistant/blob/" + version + "/CHANGELOG.md")
 
     final Document readmeDocument = Parser.builder().build().parse(readmeContent)
     HtmlRenderer.builder().build().render(readmeDocument)

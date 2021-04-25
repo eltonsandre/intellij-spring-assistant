@@ -27,7 +27,6 @@ import java.util.Set;
 import static in.oneton.idea.spring.assistant.plugin.misc.GenericUtil.truncateIdeaDummyIdentifier;
 import static in.oneton.idea.spring.assistant.plugin.misc.PsiCustomUtil.findModule;
 import static in.oneton.idea.spring.assistant.plugin.suggestion.SuggestionNode.sanitise;
-import static in.oneton.idea.spring.assistant.plugin.suggestion.completion.FileType.yaml;
 import static java.util.Objects.requireNonNull;
 
 class YamlCompletionProvider extends CompletionProvider<CompletionParameters> {
@@ -66,12 +65,12 @@ class YamlCompletionProvider extends CompletionProvider<CompletionParameters> {
                     if (child instanceof YAMLSequenceItem) {
                         final YAMLValue value = ((YAMLSequenceItem) child).getValue();
                         if (value != null) {
-                            siblingsToExclude = getNewIfNotPresent(siblingsToExclude);
+                            siblingsToExclude = this.getNewIfNotPresent(siblingsToExclude);
                             siblingsToExclude.add(sanitise(value.getText()));
                         }
 
                     } else if (child instanceof YAMLKeyValue) {
-                        siblingsToExclude = getNewIfNotPresent(siblingsToExclude);
+                        siblingsToExclude = this.getNewIfNotPresent(siblingsToExclude);
                         siblingsToExclude.add(sanitise(((YAMLKeyValue) child).getKeyText()));
                     }
                 }
@@ -81,7 +80,7 @@ class YamlCompletionProvider extends CompletionProvider<CompletionParameters> {
 
             for (final PsiElement child : parent.getChildren()) {
                 if (child != elementContext && child instanceof YAMLKeyValue) {
-                    siblingsToExclude = getNewIfNotPresent(siblingsToExclude);
+                    siblingsToExclude = this.getNewIfNotPresent(siblingsToExclude);
                     siblingsToExclude.add(sanitise(((YAMLKeyValue) child).getKeyText()));
                 }
             }
@@ -104,7 +103,7 @@ class YamlCompletionProvider extends CompletionProvider<CompletionParameters> {
         } while (context != null);
 
         suggestions = service
-                .findSuggestionsForQueryPrefix(module, yaml, element, ancestralKeys,
+                .findSuggestionsForQueryPrefix(module, FileType.YAML, element, ancestralKeys,
                         queryWithDotDelimitedPrefixes, siblingsToExclude);
 
         if (suggestions != null) {
