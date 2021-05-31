@@ -63,22 +63,22 @@ intellij {
     version = '2021.1.1'
     pluginName = 'intellij-spring-assistant'
     plugins = ['java', 'properties', 'yaml', 'maven', 'gradle']
-    updateSinceUntilBuild false
+    updateSinceUntilBuild = false
 }
 
 publishPlugin {
-    token System.getenv('IJ_PLUGIN_TOKEN')
+    token = System.getenv('IJ_PLUGIN_TOKEN')
 //    username System.getProperty('ij_plugin_portal_login')
 //    password System.getProperty('ij_plugin_portal_password')
-    channels 'eap', 'nightly', 'default'
+    channels = ['eap', 'nightly', 'default']
 }
 
 
 patchPluginXml {
-    sinceBuild '203.1.0'
-    untilBuild '211.*'
-    pluginDescription readmeXmlAsHtml()
-    changeNotes changeLogAsHtml()
+    sinceBuild = '203.1.0'
+    untilBuild = '211.*'
+    pluginDescription = readmeXmlAsHtml()
+    changeNotes = changeLogAsHtml()
 }
 
 String readmeXmlAsHtml() {
